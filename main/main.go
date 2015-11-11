@@ -35,18 +35,18 @@ func ft() {}
 
 var test2 = 3
 
-type Action func(int, int, *[]wp) int
+type Action func(int, int, []wp) (int, []wp)
 
-//const A1 Action =3
-var A1 = func(j, pos int, wps *[]wp) int { fmt.Printf("in A1\n"); return j }
-var A0 = func(j, pos int, wps *[]wp) int { fmt.Printf("in A0\n"); return j }
-var EN = func(j, pos int,  wps* []wp) int { fmt.Printf("in EN %d %d\n", j, pos); return pos }
-var EI = func(j, pos int,  wps *[]wp) int {
+var noOp = func(j, pos int, wps []wp)(int, []wp) { return j, wps }
+var A1 = noOp
+var A0 = noOp
+var EN = func(j, pos int, wps []wp)(int, []wp) { return pos, wps}
+var emit = func(j, pos int,  wps []wp) (int, []wp) {
 	fmt.Printf("in EI %d %d\n", j, pos-1);
 	wps = append(wps, wp{j, pos-1})
 	fmt.Printf("len of wps in EI %d\n", len(wps))
-	return pos }
-
+	return pos, wps }
+var EI = emit
 type sa struct { // state pair
 	state  int
 	action Action
@@ -100,7 +100,7 @@ func main() {
 		}
 		fmt.Printf("curState %d, ctype %d\n", curState, thisCtype)
 		thisSA = state[curState][thisCtype]
-		j = thisSA.action(j, bpos, wps)
+		j, wps = thisSA.action(j, bpos, wps)
 		fmt.Printf("j=%d\n", j)
 		curState = thisSA.state
 		runes = append(runes, rune)
@@ -109,6 +109,7 @@ func main() {
 	fmt.Printf("length of wps %d\n", len(wps))
 	for _, wp := range wps {
 		fmt.Print(wp)
+		fmt.Printf("%s\n", text[wp.start:wp.end+1])
 		//fmt.Printf("%d %d\n", wp.start wp.end)
 	}
 }
