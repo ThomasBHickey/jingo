@@ -1,12 +1,8 @@
 package jingo
 
 import (
-	//"bufio"
 	"fmt"
-	//"os"
-	//"github.com/ThomasBHickey/fileserver"
 )
-
 const (
 	SS  = iota // Space
 	SX         // Other
@@ -30,32 +26,14 @@ const (
 	CC        //7            /* colon                                   */
 	CQ        //8            /* quote    */
 )
-
-func ft() {}
-
-var test2 = 3
-
-//type Action func(int, int, []wp) (int, []wp)
-
-//var noOp = func(j, pos int, wps []wp) (int, []wp) { return j, wps }
-//var A1 = func(j, pos int, wps []wp) (int, []wp) { fmt.Print("A1");return j, wps }
-//var A0 = func(j, pos int, wps []wp) (int, []wp) { fmt.Print("A0");return j, wps }
-//var EN = func(j, pos int, wps []wp) (int, []wp) { fmt.Print("EN");return pos, wps }
-//var emit = func(j, pos int, wps []wp) (int, []wp) {
-	///fmt.Printf("in EI %d %d\n", j, pos-1)
-	//wps = append(wps, wp{j, pos - 1})
-	//fmt.Printf("len of wps in EI %d\n", len(wps))
-	//return pos, wps
-//}
 const (
-	E0 = iota 
+	E0 = iota
 	EI // emit
 	EN
-	)
-	
+)
 
-type sa struct { new, effect int}
-type wp struct { start, end int } // word position
+type sa struct{ new, effect int }
+type wp struct{ start, end int } // word position
 
 var ctype = [128]int{
 	0, 0, 0, 0, 0, 0, 0, 0, 0, CS, 0, 0, 0, 0, 0, 0, /* 0                  */
@@ -67,7 +45,7 @@ var ctype = [128]int{
 	0, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, /* 6 `abcdefghijklmno */
 	CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, 0, 0, 0, 0, 0} /* 7 pqrstuvwxyz{|}~  */
 
-var state = [][]sa{
+var state = [10][9]sa{
 	/*SS */ {sa{SX, EN}, sa{SS, E0}, sa{SA, EN}, sa{SN, EN}, sa{SA, EN}, sa{S9, EN}, sa{SX, EN}, sa{SX, EN}, sa{SQ, EN}},
 	/*SX */ {sa{SX, EI}, sa{SS, EI}, sa{SA, EI}, sa{SN, EI}, sa{SA, EI}, sa{S9, EI}, sa{SX, E0}, sa{SX, E0}, sa{SQ, EI}},
 	/*SA */ {sa{SX, EI}, sa{SS, EI}, sa{SA, E0}, sa{SA, E0}, sa{SA, E0}, sa{SA, E0}, sa{SX, E0}, sa{SX, E0}, sa{SQ, EI}},
@@ -79,44 +57,57 @@ var state = [][]sa{
 	/*SQQ*/ {sa{SX, EI}, sa{SS, EI}, sa{SA, EI}, sa{SN, EI}, sa{SA, EI}, sa{S9, EI}, sa{SX, EI}, sa{SX, EI}, sa{SQ, E0}},
 	/*SZ */ {sa{SZ, E0}, sa{SZ, E0}, sa{SZ, E0}, sa{SZ, E0}, sa{SZ, E0}, sa{SZ, E0}, sa{SZ, E0}, sa{SZ, E0}, sa{SZ, E0}}}
 
-func Scan(text string) {
+func Scan(text string) []wp {
 	fmt.Println("In Scan", text)
-	//reader := bufio.NewReader(os.Stdin)
-	//fmt.Print("> ")
-	//text, _ := reader.ReadString('\n')
-	//fmt.Println(text)
-	//fmt.Println("test:%d", state[0][0].action(3, 2))
-	cs := SS // current state
+	nv := false                  // numeric value being built
+	cs := SS                     // current state
 	wps := make([]wp, len(text)) // word positions
-	
-	
-	j := 0
-	var thisSA sa
-	//var thisCtype int
-	//var rpos int
-	t := false // true if building numeric vector
+	t := false                   // true if building numeric vector (S9)
+	var b int                    // beginning index of current word
+	var xb, xe int               // beginning/end index of current numeric vector
+	var e int                    // effect associated with state
 	for bpos, rune := range text {
 		//fmt.Printf("%#U starts at byte position %d\n", rune, bpos)
-		ct := CA // default
+		ct := CA // default current char type
 		if rune < 128 {
 			ct = ctype[rune]
 		}
-		//fmt.Printf("curState %d, ctype %d\n", curState, thisCtype)
+		fmt.Println("curState", cs, "ctype", ct)
 		p := state[cs][ct]
-		e := p.effect
-		if e==EI {
-			t = t && (cs==S9)
+		if e = p.effect; e == EI {
+			if t := t && (cs == S9); t {
+				if !nv {
+					nv = true
+					xb = b
+				}
+				xe = bpos
+			} else {
+				if nv {
+					nv = false
+					wps = append(wps, wp{xb, xe})
+				}
+				wps = append(wps, wp{b, bpos})
+			}
 		}
-		j, wps = thisSA.action(j, bpos, wps)
-		//fmt.Printf("j=%d\n", j)
-		curState = thisSA.state
-		runes = append(runes, rune)
-		rpos = rpos + 1
+		cs = p.new
+		if e != E0 {
+			b = bpos
+			t = cs == S9
+		}
 	}
-	//fmt.Printf("length of wps %d\n", len(wps))
-	for _, wp := range wps {
-		fmt.Print(wp)
-		fmt.Printf("%s\n", text[wp.start:wp.end+1])
-		//fmt.Printf("%d %d\n", wp.start wp.end)
+	if cs == SQ {
+		return wps
 	}
+	t = t && (cs == S9)
+	if t {
+		wps = append(wps, wp{xb, xe})
+	} else {
+		if nv {
+			wps = append(wps, wp{xb, xe})
+		}
+		if cs != SS {
+			wps = append(wps, wp{b, b})
+		}
+	}
+	return wps
 }
