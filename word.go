@@ -33,7 +33,7 @@ const (
 )
 
 type sa struct{ new, effect int }
-type wp struct{ start, end int } // word position
+type wp struct{ Start, End int } // word position
 
 var ctype = [128]int{
 	0, 0, 0, 0, 0, 0, 0, 0, 0, CS, 0, 0, 0, 0, 0, 0, /* 0                  */
