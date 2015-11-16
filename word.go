@@ -3,6 +3,7 @@ package jingo
 import (
 	"fmt"
 )
+
 const (
 	SS  = iota // Space
 	SX         // Other
@@ -26,6 +27,16 @@ const (
 	CC        //7            /* colon                                   */
 	CQ        //8            /* quote    */
 )
+
+var ctype = [128]int{
+	0, 0, 0, 0, 0, 0, 0, 0, 0, CS, 0, 0, 0, 0, 0, 0, // 0
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 1
+	CS, 0, 0, 0, 0, 0, 0, CQ, 0, 0, 0, 0, 0, 0, CD, 0, // 2  !"#$%&'()*+,-./
+	C9, C9, C9, C9, C9, C9, C9, C9, C9, C9, CC, 0, 0, 0, 0, 0, // 3 0123456789:;<=>?
+	0, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, // 4 @ABCDEFGHIJKLMNO
+	CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, 0, 0, 0, 0, C9, // 5 PQRSTUVWXYZ[\]^_
+	0, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, // 6 `abcdefghijklmno
+	CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, 0, 0, 0, 0, 0} // 7 pqrstuvwxyz{|}~
 const (
 	E0 = iota
 	EI // emit
@@ -34,17 +45,6 @@ const (
 
 type sa struct{ new, effect int }
 type wp struct{ Start, End int } // word position
-
-var ctype = [128]int{
-	0, 0, 0, 0, 0, 0, 0, 0, 0, CS, 0, 0, 0, 0, 0, 0, /* 0                  */
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 1                  */
-	CS, 0, 0, 0, 0, 0, 0, CQ, 0, 0, 0, 0, 0, 0, CD, 0, /* 2  !"#$%&'()*+,-./ */
-	C9, C9, C9, C9, C9, C9, C9, C9, C9, C9, CC, 0, 0, 0, 0, 0, /* 3 0123456789:;<=>? */
-	0, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, /* 4 @ABCDEFGHIJKLMNO */
-	CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, 0, 0, 0, 0, C9, /* 5 PQRSTUVWXYZ[\]^_ */
-	0, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, /* 6 `abcdefghijklmno */
-	CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, 0, 0, 0, 0, 0} /* 7 pqrstuvwxyz{|}~  */
-
 var state = [10][9]sa{
 	/*SS */ {sa{SX, EN}, sa{SS, E0}, sa{SA, EN}, sa{SN, EN}, sa{SA, EN}, sa{S9, EN}, sa{SX, EN}, sa{SX, EN}, sa{SQ, EN}},
 	/*SX */ {sa{SX, EI}, sa{SS, EI}, sa{SA, EI}, sa{SN, EI}, sa{SA, EI}, sa{S9, EI}, sa{SX, E0}, sa{SX, E0}, sa{SQ, EI}},
@@ -59,20 +59,21 @@ var state = [10][9]sa{
 
 func Scan(text string) []wp {
 	fmt.Println("In Scan", text)
-	nv := false                  // numeric value being built
-	cs := SS                     // current state
-	wps := make([]wp, len(text)) // word positions
-	t := false                   // true if building numeric vector (S9)
-	var b int                    // beginning index of current word
-	var xb, xe int               // beginning/end index of current numeric vector
-	var e int                    // effect associated with state
+	nv := false    // numeric value being built
+	cs := SS       // current state
+	wps := []wp{}  // word positions
+	t := false     // true if building numeric vector (S9)
+	var b int      // beginning index of current word
+	var xb, xe int // beginning/end index of current numeric vector
+	var e int      // effect associated with state
+	var bpos int
 	for bpos, rune := range text {
 		//fmt.Printf("%#U starts at byte position %d\n", rune, bpos)
 		ct := CA // default current char type
 		if rune < 128 {
 			ct = ctype[rune]
 		}
-		fmt.Println("curState", cs, "ctype", ct)
+		fmt.Println("curState", cs, "ctype", ct, "rune", rune)
 		p := state[cs][ct]
 		if e = p.effect; e == EI {
 			if t := t && (cs == S9); t {
@@ -84,8 +85,10 @@ func Scan(text string) []wp {
 			} else {
 				if nv {
 					nv = false
+					fmt.Println("emit 1", text[xb:xe])
 					wps = append(wps, wp{xb, xe})
 				}
+				fmt.Println("emit 2", text[b:bpos])
 				wps = append(wps, wp{b, bpos})
 			}
 		}
@@ -95,18 +98,28 @@ func Scan(text string) []wp {
 			t = cs == S9
 		}
 	}
+	//bpos = bpos+1
+	fmt.Println("finished loop", "cs", cs, "t", t, "nv", nv, "xb", xb, "xe", xe, "b", b, "bpos", bpos)
 	if cs == SQ {
-		return wps
+		return []wp{} // needs error condition
 	}
 	t = t && (cs == S9)
 	if t {
-		wps = append(wps, wp{xb, xe})
+		if nv {
+			wps = append(wps, wp{xb, len(text)})
+			fmt.Println("emit 3a", xb, len(text), text[xb:len(text)])
+		} else {
+			wps = append(wps, wp{b, len(text)})
+			fmt.Println("emit 3b", b, len(text), text[b:len(text)])
+		}
 	} else {
 		if nv {
 			wps = append(wps, wp{xb, xe})
+			fmt.Println("emit 4:", xb, xe, text[xb:xe])
 		}
 		if cs != SS {
-			wps = append(wps, wp{b, b})
+			wps = append(wps, wp{b, len(text)})
+			fmt.Println("emit 5:", b, len(text), text[b:len(text)])
 		}
 	}
 	return wps
