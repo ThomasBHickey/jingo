@@ -16,17 +16,18 @@ const (
 	SQQ        // Even quotes
 	SZ         // Trailing comment
 )
-const (
-	CX = iota //0 /* other                                   */
-	CS        //1            /* space or tab                            */
-	CA        //2            /* letter                                  */
-	CN        //3            /* N (capital N)                           */
-	CB        //4            /* B (capital B)                           */
-	C9        //5            /* digit or sign (underscore)              */
-	CD        //6            /* dot                                     */
-	CC        //7            /* colon                                   */
-	CQ        //8            /* quote    */
-)
+
+/*const (
+	CX = iota //0            // other
+	CS        //1            // space or tab
+	CA        //2            // letter
+	CN        //3            // N (capital N)
+	CB        //4            // B (capital B)
+	C9        //5            // digit or sign (underscore)
+	CD        //6            // dot
+	CC        //7            // colon
+	CQ        //8            // quote
+)*/ //moved to jc.go
 
 var ctype = [128]int{
 	0, 0, 0, 0, 0, 0, 0, 0, 0, CS, 0, 0, 0, 0, 0, 0, // 0
