@@ -1,5 +1,8 @@
 package jingo
 
+import (
+	"fmt"
+)
 var spellt = [3][3]byte{
 	{'a', 'a', 'a'},
 	{'a', 'a', 'a'},
@@ -33,3 +36,14 @@ var spell = [3][70]byte{
 		CPCO, CQCO, 1, CSCO, CSCAPCO, CTCO, 1, CUCO,
 		1, CXCO, 1, CFCONS, CFCONS, CFCONS, CFCONS, CFCONS,
 		CFCONS, CFCONS, CFCONS, CFCONS, CFCONS, 0}}
+
+var mapS2I = map[string] int{}
+
+func init() {
+	var r rune
+	for i:=0; i<70; i++ {
+		r = rune(spell[0][i])
+		mapS2I[string(r)]=i
+	}
+	fmt.Println(mapS2I)
+}
