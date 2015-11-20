@@ -10,7 +10,7 @@ import (
 
 
 func main() {
-	fmt.Println("In Main")
+	//fmt.Println("In Main")
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print("> ")
 	text, _ := reader.ReadString('\n')

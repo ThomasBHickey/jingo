@@ -1,7 +1,7 @@
 package jingo
 
 import (
-	"fmt"
+	//"fmt"
 )
 
 const (
@@ -51,7 +51,8 @@ const (
 	LAST0   = (B01 | LIT | C2T | NAME)
 )
 
-func init() {
-	fmt.Printf("XZ:  %x\n", XZ)
-	fmt.Printf("ANY: %x\n", ANY)
-}
+// func init() {
+// 	fmt.Printf("XZ:  %x\n", XZ)
+// 	fmt.Printf("ANY: %x\n", ANY)
+// 	fmt.Printf("ANY & XZ %x\n", ANY & XZ)
+// }

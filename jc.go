@@ -1,7 +1,7 @@
 package jingo
 
 import (
-	"fmt"
+	//"fmt"
 	)
 
 // from jc.h
@@ -206,6 +206,6 @@ const (
 	CFF = 0377 /* 255 377 ff                              */
 )
 
-func init() {
-	fmt.Println("in jc.go")
-}
+// func init() {
+// 	fmt.Println("in jc.go")
+// }
