@@ -39,6 +39,18 @@ var spell = [3][70]byte{
 
 var mapS2I = map[string] int{}
 
+// func init() {
+// 	for _, row := range(spell){
+// 		fmt.Println("row ", row)
+// 	}
+// }
+const (
+	a = 1<<iota
+	b
+	c)
+func init() {
+	fmt.Println("a,b,c", a, b, c)
+}
 func init() {
 	var r rune
 	runes := make([]rune, 2)
@@ -52,6 +64,6 @@ func init() {
 		mapS2I[string(runes)] = int(spell[2][i])
 	}
 	fmt.Println(len(mapS2I))
-	fmt.Println(mapS2I["="], mapS2I["=."], mapS2I["=:"])
-	fmt.Println(mapS2I)
+	fmt.Println("= :", mapS2I["="], mapS2I["=."], mapS2I["=:"])
+	//fmt.Println(mapS2I)
 }

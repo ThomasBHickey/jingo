@@ -1,5 +1,9 @@
 package jingo
 
+import (
+	"fmt"
+	)
+
 // from jc.h
 const (
 	CX = iota //0			 /* other                                   */
@@ -201,3 +205,7 @@ const (
 
 	CFF = 0377 /* 255 377 ff                              */
 )
+
+func init() {
+	fmt.Println("in jc.go")
+}
