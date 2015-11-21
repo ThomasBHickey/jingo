@@ -1,7 +1,7 @@
 package jingo
 
 import (
-	//"fmt"
+//"fmt"
 )
 
 const (
