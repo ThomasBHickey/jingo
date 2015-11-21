@@ -37,19 +37,19 @@ var spell = [3][70]byte{
 		1, CXCO, 1, CFCONS, CFCONS, CFCONS, CFCONS, CFCONS,
 		CFCONS, CFCONS, CFCONS, CFCONS, CFCONS, 0}}
 
-var mapS2I = map[string] int{}
+var spellIn = map[string] int{}
 
 func init() {
 	var r rune
 	runes := make([]rune, 2)
 	for i:=0; i<70; i++ {
 		r = rune(spell[0][i])
-		mapS2I[string(r)]=int(r)
+		spellIn[string(r)]=int(r)
 		runes[0] = r
 		runes[1] = '.'
-		mapS2I[string(runes)] = int(spell[1][i])
+		spellIn[string(runes)] = int(spell[1][i])
 		runes[1] = ':'
-		mapS2I[string(runes)] = int(spell[2][i])
+		spellIn[string(runes)] = int(spell[2][i])
 	}
 	//fmt.Println(len(mapS2I))
 	//fmt.Println("= :", mapS2I["="], mapS2I["=."], mapS2I["=:"])

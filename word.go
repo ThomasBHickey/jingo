@@ -57,7 +57,13 @@ var state = [10][9]sa{
 	/*SQ */ {sa{SQ, E0}, sa{SQ, E0}, sa{SQ, E0}, sa{SQ, E0}, sa{SQ, E0}, sa{SQ, E0}, sa{SQ, E0}, sa{SQ, E0}, sa{SQQ, E0}},
 	/*SQQ*/ {sa{SX, EI}, sa{SS, EI}, sa{SA, EI}, sa{SN, EI}, sa{SA, EI}, sa{S9, EI}, sa{SX, EI}, sa{SX, EI}, sa{SQ, E0}},
 	/*SZ */ {sa{SZ, E0}, sa{SZ, E0}, sa{SZ, E0}, sa{SZ, E0}, sa{SZ, E0}, sa{SZ, E0}, sa{SZ, E0}, sa{SZ, E0}, sa{SZ, E0}}}
-
+func runeToCType(r rune) int{
+	if r<128 {
+		return ctype[r]
+	} else {
+		return CA
+	}
+}
 func Scan(text string) []wp {
 	fmt.Println("In Scan", text)
 	nv := false    // numeric value being built
@@ -70,10 +76,11 @@ func Scan(text string) []wp {
 	//var bpos int
 	for bpos, rune := range text {
 		//fmt.Printf("%#U starts at byte position %d\n", rune, bpos)
-		ct := CA // default current char type
-		if rune < 128 {
-			ct = ctype[rune]
-		}
+		ct := runeToCType(rune)
+		// ct := CA // default current char type
+		// if rune < 128 {
+		// 	ct = ctype[rune]
+		// }
 		fmt.Println("curState", cs, "ctype", ct, "rune", rune)
 		p := state[cs][ct]
 		if e = p.effect; e == EI {
@@ -121,6 +128,14 @@ func Scan(text string) []wp {
 		if cs != SS {
 			wps = append(wps, wp{b, len(text)})
 			fmt.Println("emit 5:", b, len(text), text[b:len(text)])
+		}
+	}
+	for _, wp := range(wps) {
+		s := text[wp.Start:wp.End]
+		fmt.Println("wp", s)
+		if len(s)>=0 {
+			c0 := []rune(s)[0]
+			fmt.Println("ctype", c0, runeToCType(c0))
 		}
 	}
 	return wps
