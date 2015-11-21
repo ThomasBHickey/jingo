@@ -67,7 +67,7 @@ func Scan(text string) []wp {
 	var b int      // beginning index of current word
 	var xb, xe int // beginning/end index of current numeric vector
 	var e int      // effect associated with state
-	var bpos int
+	//var bpos int
 	for bpos, rune := range text {
 		//fmt.Printf("%#U starts at byte position %d\n", rune, bpos)
 		ct := CA // default current char type
@@ -100,7 +100,7 @@ func Scan(text string) []wp {
 		}
 	}
 	//bpos = bpos+1
-	fmt.Println("finished loop", "cs", cs, "t", t, "nv", nv, "xb", xb, "xe", xe, "b", b, "bpos", bpos)
+	//fmt.Println("finished loop", "cs", cs, "t", t, "nv", nv, "xb", xb, "xe", xe, "b", b, "bpos", bpos)
 	if cs == SQ {
 		return []wp{} // needs error condition
 	}
