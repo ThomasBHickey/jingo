@@ -27,17 +27,17 @@ const (
 	CD        //6            // dot
 	CC        //7            // colon
 	CQ        //8            // quote
-)*/ //moved to jc.go
+)*/ //moved to t.go
 
-var ctype = [128]int{
-	0, 0, 0, 0, 0, 0, 0, 0, 0, CS, 0, 0, 0, 0, 0, 0, // 0
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 1
-	CS, 0, 0, 0, 0, 0, 0, CQ, 0, 0, 0, 0, 0, 0, CD, 0, // 2  !"#$%&'()*+,-./
-	C9, C9, C9, C9, C9, C9, C9, C9, C9, C9, CC, 0, 0, 0, 0, 0, // 3 0123456789:;<=>?
-	0, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, // 4 @ABCDEFGHIJKLMNO
-	CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, 0, 0, 0, 0, C9, // 5 PQRSTUVWXYZ[\]^_
-	0, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, // 6 `abcdefghijklmno
-	CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, 0, 0, 0, 0, 0} // 7 pqrstuvwxyz{|}~
+// var ctype = [128]int{  // back in t.go
+// 	0, 0, 0, 0, 0, 0, 0, 0, 0, CS, 0, 0, 0, 0, 0, 0, // 0
+// 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 1
+// 	CS, 0, 0, 0, 0, 0, 0, CQ, 0, 0, 0, 0, 0, 0, CD, 0, // 2  !"#$%&'()*+,-./
+// 	C9, C9, C9, C9, C9, C9, C9, C9, C9, C9, CC, 0, 0, 0, 0, 0, // 3 0123456789:;<=>?
+// 	0, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, // 4 @ABCDEFGHIJKLMNO
+// 	CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, 0, 0, 0, 0, C9, // 5 PQRSTUVWXYZ[\]^_
+// 	0, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, // 6 `abcdefghijklmno
+// 	CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, 0, 0, 0, 0, 0} // 7 pqrstuvwxyz{|}~
 const (
 	E0 = iota
 	EI // emit
@@ -57,9 +57,17 @@ var state = [10][9]sa{
 	/*SQ */ {sa{SQ, E0}, sa{SQ, E0}, sa{SQ, E0}, sa{SQ, E0}, sa{SQ, E0}, sa{SQ, E0}, sa{SQ, E0}, sa{SQ, E0}, sa{SQQ, E0}},
 	/*SQQ*/ {sa{SX, EI}, sa{SS, EI}, sa{SA, EI}, sa{SN, EI}, sa{SA, EI}, sa{S9, EI}, sa{SX, EI}, sa{SX, EI}, sa{SQ, E0}},
 	/*SZ */ {sa{SZ, E0}, sa{SZ, E0}, sa{SZ, E0}, sa{SZ, E0}, sa{SZ, E0}, sa{SZ, E0}, sa{SZ, E0}, sa{SZ, E0}, sa{SZ, E0}}}
-func runeToCType(r rune) int{
-	if r<128 {
+
+func runeToCType(r rune) int {
+	if r < 128 {
 		return ctype[r]
+	} else {
+		return CA
+	}
+}
+func runeToWType(r rune) int {
+	if r < 128 {
+		return wtype[r]
 	} else {
 		return CA
 	}
@@ -130,12 +138,12 @@ func Scan(text string) []wp {
 			fmt.Println("emit 5:", b, len(text), text[b:len(text)])
 		}
 	}
-	for _, wp := range(wps) {
+	for _, wp := range wps {
 		s := text[wp.Start:wp.End]
 		fmt.Println("wp", s)
-		if len(s)>=0 {
+		if len(s) >= 0 {
 			c0 := []rune(s)[0]
-			fmt.Println("ctype", c0, runeToCType(c0))
+			fmt.Println("wtype", c0, runeToWType(c0))
 		}
 	}
 	return wps

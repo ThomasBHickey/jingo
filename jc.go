@@ -1,8 +1,8 @@
 package jingo
 
 import (
-	//"fmt"
-	)
+//"fmt"
+)
 
 // from jc.h
 const (
