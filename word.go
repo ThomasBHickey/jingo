@@ -17,27 +17,6 @@ const (
 	SZ         // Trailing comment
 )
 
-/*const (
-	CX = iota //0            // other
-	CS        //1            // space or tab
-	CA        //2            // letter
-	CN        //3            // N (capital N)
-	CB        //4            // B (capital B)
-	C9        //5            // digit or sign (underscore)
-	CD        //6            // dot
-	CC        //7            // colon
-	CQ        //8            // quote
-)*/ //moved to t.go
-
-// var ctype = [128]int{  // back in t.go
-// 	0, 0, 0, 0, 0, 0, 0, 0, 0, CS, 0, 0, 0, 0, 0, 0, // 0
-// 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 1
-// 	CS, 0, 0, 0, 0, 0, 0, CQ, 0, 0, 0, 0, 0, 0, CD, 0, // 2  !"#$%&'()*+,-./
-// 	C9, C9, C9, C9, C9, C9, C9, C9, C9, C9, CC, 0, 0, 0, 0, 0, // 3 0123456789:;<=>?
-// 	0, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, // 4 @ABCDEFGHIJKLMNO
-// 	CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, 0, 0, 0, 0, C9, // 5 PQRSTUVWXYZ[\]^_
-// 	0, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, // 6 `abcdefghijklmno
-// 	CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, 0, 0, 0, 0, 0} // 7 pqrstuvwxyz{|}~
 const (
 	E0 = iota
 	EI // emit
@@ -146,8 +125,8 @@ func Scan(text string) []wp {
 			fmt.Println("wtype", c0, runeToWType(c0), "spellin", spellIn[s])
 			id := spellIn[s]
 			pdef, ok := id2pdef[id]
-			if ok{
-				dyres, _ := pdef.dyadFunc(2,3)
+			if ok {
+				dyres, _ := pdef.dyadFunc(2, 3)
 				fmt.Println("pdef dyres", dyres)
 			}
 		}
