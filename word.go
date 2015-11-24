@@ -143,7 +143,13 @@ func Scan(text string) []wp {
 		fmt.Println("wp", s)
 		if len(s) >= 0 {
 			c0 := []rune(s)[0]
-			fmt.Println("wtype", c0, runeToWType(c0))
+			fmt.Println("wtype", c0, runeToWType(c0), "spellin", spellIn[s])
+			id := spellIn[s]
+			pdef, ok := id2pdef[id]
+			if ok{
+				dyres, _ := pdef.dyadFunc(2,3)
+				fmt.Println("pdef dyres", dyres)
+			}
 		}
 	}
 	return wps

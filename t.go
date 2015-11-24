@@ -25,9 +25,12 @@ func init() {
 	wtype['B'] = CB
 }
 
+// pst [256]int  // not clear what pst is used for
+var id2pdef = map[int]pdef{}
 type dyad func(x, y int) (rv int, err error)
 type monand func(x int) (rv int, err error)
 type pdef struct {
+	ptype byte
 	monadFunc monand
 	dyadFunc  dyad
 	monadicRank,
@@ -35,11 +38,22 @@ type pdef struct {
 	rightRank,
 	funcDepth,
 	spelling int
-	pst [256]int
 }
 
 func add2(x, y int) (int, error) {
 	return x + y, nil
+}
+type Val []int
+type Array struct{
+	atype byte
+	refCount, numAtoms int
+	shape []int
+	value Val
+}
+
+func asgn(a Array, w int) (Array, error){
+	fmt.Println("In func asgn!")
+	return Array{}, nil
 }
 
 type value struct{ z int }
@@ -50,4 +64,5 @@ func init() {
 	f2 = add2
 	res, _ := f2(1, 2)
 	fmt.Println("f2: ", res)
+	id2pdef[CGASGN] = pdef{dyadFunc:add2}
 }
