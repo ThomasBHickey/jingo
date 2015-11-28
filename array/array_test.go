@@ -16,4 +16,6 @@ func TestArray(t *testing.T) {
 	fmt.Println("a as []int64", a.Data.([]int64))
 	a.Data.([]int64)[3] = 4
 	a.ShowArray()
+	b := NewByteArray(shape)
+	b.ShowArray()
 }

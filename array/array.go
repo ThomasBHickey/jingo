@@ -13,17 +13,30 @@ type Vector interface{}
 type Array struct {
 	Type     byte
 	RefCount int
+	length   int
 	Shape    []int
 	Data     Vector
 }
 
-func NewIntArray(shape []int) (a Array) {
-	a.Type = jingo.INT
+func  newArray(shape []int) (a Array){
 	a.RefCount = 1
-	length := 1
-	for _, sp := range(shape) { length *= sp }
+	a.length = 1
+	for _, sp := range(shape) { a.length *= sp }
 	a.Shape = shape
-	a.Data = make([]int64, length)
+	return
+}
+
+func NewIntArray(shape []int) (a Array) {
+	a = newArray(shape)
+	a.Type = jingo.INT
+	a.Data = make([]int64, a.length)
+	return
+}
+
+func NewByteArray(shape []int)(a Array){
+	a = newArray(shape)
+	a.Type = jingo.LIT
+	a.Data = make([]byte, a.length)
 	return
 }
 func (array Array) ShowArray() {
@@ -33,5 +46,8 @@ func (array Array) ShowArray() {
 		fmt.Println(array)
 		fmt.Println("Shape", array.Shape)
 		fmt.Println("Array length", len(array.Data.([]int64)))
+	case jingo.LIT:
+		fmt.Println("Found LIT array")
+		fmt.Println("Array length", len(array.Data.([]byte)))
 	}
 }
