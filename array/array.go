@@ -23,7 +23,7 @@ func NewIntArray(shape []int) (a Array) {
 	length := 1
 	for _, sp := range(shape) { length *= sp }
 	a.Shape = shape
-	a.Data = make([]int, length)
+	a.Data = make([]int64, length)
 	return
 }
 func (array Array) ShowArray() {
@@ -32,6 +32,6 @@ func (array Array) ShowArray() {
 		fmt.Println("Found INT array")
 		fmt.Println(array)
 		fmt.Println("Shape", array.Shape)
-		fmt.Println("Array length", len(array.Data.([]int)))
+		fmt.Println("Array length", len(array.Data.([]int64)))
 	}
 }

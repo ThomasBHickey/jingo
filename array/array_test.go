@@ -13,7 +13,7 @@ func TestArray(t *testing.T) {
 	shape = append(append(shape, 3), 4)
 	a := NewIntArray(shape)
 	fmt.Println("a Array", reflect.TypeOf(a.Data))
-	fmt.Println("a as []int", a.Data.([]int))
-	a.Data.([]int)[3] = 4
+	fmt.Println("a as []int64", a.Data.([]int64))
+	a.Data.([]int64)[3] = 4
 	a.ShowArray()
 }
