@@ -51,7 +51,13 @@ func runeToWType(r rune) int {
 		return CA
 	}
 }
-func Scan(text string) []wp {
+type snpdef struct{  // s and pdef
+	s string
+	id int
+	pd pdef
+}
+
+func Scan(text string) []snpdef {
 	fmt.Println("In Scan", text)
 	nv := false    // numeric value being built
 	cs := SS       // current state
@@ -60,7 +66,7 @@ func Scan(text string) []wp {
 	var b int      // beginning index of current word
 	var xb, xe int // beginning/end index of current numeric vector
 	var e int      // effect associated with state
-	//var bpos int
+
 	for bpos, rune := range text {
 		//fmt.Printf("%#U starts at byte position %d\n", rune, bpos)
 		ct := runeToCType(rune)
@@ -95,8 +101,9 @@ func Scan(text string) []wp {
 	}
 	//bpos = bpos+1
 	//fmt.Println("finished loop", "cs", cs, "t", t, "nv", nv, "xb", xb, "xe", xe, "b", b, "bpos", bpos)
+	snpdefs := []snpdef{}
 	if cs == SQ {
-		return []wp{} // needs error condition
+		return snpdefs // needs error condition
 	}
 	t = t && (cs == S9)
 	if t {
@@ -125,11 +132,15 @@ func Scan(text string) []wp {
 			fmt.Println("wtype", c0, runeToWType(c0), "spellin", spellIn[s])
 			id := spellIn[s]
 			pdef, ok := id2pdef[id]
+			snpdefs = append(snpdefs, snpdef{s:s, id:id, pd:pdef})
 			if ok {
 				dyres, _ := pdef.dyadFunc(2, 3)
 				fmt.Println("pdef dyres", dyres)
 			}
 		}
 	}
-	return wps
+	for _, sp := range(snpdefs){
+		fmt.Println("s",sp.s, "id",sp.id,"pd", sp.pd)
+	}
+	return snpdefs
 }
