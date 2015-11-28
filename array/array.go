@@ -18,11 +18,12 @@ type Array struct {
 }
 
 func NewIntArray(shape []int) (a Array) {
-	var v []int
 	a.Type = jingo.INT
 	a.RefCount = 1
+	length := 1
+	for _, sp := range(shape) { length *= sp }
 	a.Shape = shape
-	a.Data = v
+	a.Data = make([]int, length)
 	return
 }
 func (array Array) ShowArray() {
