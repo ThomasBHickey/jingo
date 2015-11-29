@@ -51,8 +51,9 @@ func runeToWType(r rune) int {
 		return CA
 	}
 }
-type snpdef struct{  // s and pdef
-	s string
+
+type snpdef struct { // s and pdef
+	s  string
 	id int
 	pd pdef
 }
@@ -132,15 +133,15 @@ func Scan(text string) []snpdef {
 			fmt.Println("wtype", c0, runeToWType(c0), "spellin", spellIn[s])
 			id := spellIn[s]
 			pdef, ok := id2pdef[id]
-			snpdefs = append(snpdefs, snpdef{s:s, id:id, pd:pdef})
+			snpdefs = append(snpdefs, snpdef{s: s, id: id, pd: pdef})
 			if ok {
-				dyres, _ := pdef.dyadFunc(2, 3)
+				dyres, _ := pdef.Dyad(Array{}, Array{})
 				fmt.Println("pdef dyres", dyres)
 			}
 		}
 	}
-	for _, sp := range(snpdefs){
-		fmt.Println("s",sp.s, "id",sp.id,"pd", sp.pd)
+	for _, sp := range snpdefs {
+		fmt.Println("s", sp.s, "id", sp.id, "pd", sp.pd)
 	}
 	return snpdefs
 }

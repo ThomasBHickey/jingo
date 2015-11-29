@@ -1,6 +1,7 @@
 package jingo
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -28,12 +29,12 @@ func init() {
 // pst [256]int  // not clear what pst is used for
 var id2pdef = map[int]pdef{}
 
-type dyad func(x, y int) (rv int, err error)
-type monand func(x int) (rv int, err error)
+type dyad func(x, y Array) (rv Array, err error)
+type monad func(x Array) (rv Array, err error)
 type pdef struct {
-	ptype     byte
-	monadFunc monand
-	dyadFunc  dyad
+	ptype int
+	Monad monad
+	Dyad  dyad
 	monadicRank,
 	leftRank,
 	rightRank,
@@ -41,19 +42,25 @@ type pdef struct {
 	spelling int
 }
 
-func add2(x, y int) (int, error) {
-	return x + y, nil
+func add2(x, y Array) (Array, error) {
+	ra := NewIntArray(x.Shape)
+	if x.Type==INT && y.Type==INT{
+		ra.Data = make([]int64, x.Length)
+		ra.Data.([]int64)[0] = x.Data.([]int64)[0] + y.Data.([]int64)[0]
+		return ra, nil
+	}
+	return ra, errors.New("Unexpected arrays in add2")
 }
 
-type Val []int
-type Array struct {
-	atype              byte
-	refCount, numAtoms int
-	shape              []int
-	value              Val
-}
+// type Val []int
+// type Array struct {
+// 	atype              byte
+// 	refCount, numAtoms int
+// 	shape              []int
+// 	value              Val
+// }
 
-func asgn(a Array, w int) (Array, error) {
+func asgn(a Array, w Array) (Array, error) {
 	fmt.Println("In func asgn!")
 	return Array{}, nil
 }
@@ -62,9 +69,10 @@ type value struct{ z int }
 
 func init() {
 	fmt.Println("Hi from t.go!")
-	var f2 dyad
-	f2 = add2
-	res, _ := f2(1, 2)
-	fmt.Println("f2: ", res)
-	id2pdef[CGASGN] = pdef{dyadFunc: add2}
+	// var f2 dyad
+	// f2 = add2
+	// res, _ := f2(1, 2)
+	// fmt.Println("f2: ", res)
+	id2pdef[CASGN] = pdef{ptype: ASGN, Dyad: asgn} // =.
+	id2pdef[CPLUS] = pdef{ptype: VERB, Dyad: add2} // +
 }
