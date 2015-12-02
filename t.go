@@ -29,17 +29,17 @@ func init() {
 // pst [256]int  // not clear what pst is used for
 var id2pdef = map[IDType]pdef{}
 
-type dyad func(x, y Array) (rv Array, err error)
-type monad func(x Array) (rv Array, err error)
+type dyadFunct func(x, y Array) (rv Array, err error)
+type monadFunct func(x Array) (rv Array, err error)
 type pdef struct {
 	ptype AType
-	Monad monad
-	Dyad  dyad
+	Monad monadFunct
+	Dyad  dyadFunct
 	monadicRank,
 	leftRank,
 	rightRank,
-	funcDepth,
-	spelling int
+	funcDepth int
+	spelling IDType
 }
 
 func add2(x, y Array) (Array, error) {
@@ -51,14 +51,6 @@ func add2(x, y Array) (Array, error) {
 	}
 	return ra, errors.New("Unexpected arrays in add2")
 }
-
-// type Val []int
-// type Array struct {
-// 	atype              byte
-// 	refCount, numAtoms int
-// 	shape              []int
-// 	value              Val
-// }
 
 func asgn(a Array, w Array) (Array, error) {
 	fmt.Println("In func asgn!")
