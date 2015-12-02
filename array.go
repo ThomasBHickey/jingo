@@ -10,17 +10,19 @@ import (
 
 type Vector interface{}
 type Array struct {
-	Type     byte
+	Type     AType
 	RefCount int
 	Length   int
 	Shape    []int
 	Data     Vector
 }
 
-func  newArray(shape []int) (a Array){
+func newArray(shape []int) (a Array) {
 	a.RefCount = 1
 	a.Length = 1
-	for _, sp := range(shape) { a.Length *= sp }
+	for _, sp := range shape {
+		a.Length *= sp
+	}
 	a.Shape = shape
 	return
 }
@@ -32,7 +34,7 @@ func NewIntArray(shape []int) (a Array) {
 	return
 }
 
-func NewByteArray(shape []int)(a Array){
+func NewByteArray(shape []int) (a Array) {
 	a = newArray(shape)
 	a.Type = LIT
 	a.Data = make([]byte, a.Length)

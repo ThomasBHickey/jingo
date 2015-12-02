@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-var ctype = [128]int{
+var ctype = [128]CBType{
 	00, 00, 00, 00, 00, 00, 00, 00, 00, CS, 00, 00, 00, 00, 00, 00, /* 0                  */
 	00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, /* 1                  */
 	CS, 00, 00, 00, 00, 00, 00, CQ, 00, 00, 00, 00, 00, 00, CD, 00, /* 2  !"#$%&'()*+,-./ */
@@ -16,7 +16,7 @@ var ctype = [128]int{
 	CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, CA, 00, 00, 00, 00, 00} /* 7 pqrstuvwxyz{|}~  */
 /*   1   2   3   4   5   6   7   8   9   a   b   c   d   e   f   */
 
-var wtype [128]int
+var wtype [128]CBType
 
 func init() {
 	for i, v := range ctype {
@@ -27,12 +27,12 @@ func init() {
 }
 
 // pst [256]int  // not clear what pst is used for
-var id2pdef = map[int]pdef{}
+var id2pdef = map[IDType]pdef{}
 
 type dyad func(x, y Array) (rv Array, err error)
 type monad func(x Array) (rv Array, err error)
 type pdef struct {
-	ptype int
+	ptype AType
 	Monad monad
 	Dyad  dyad
 	monadicRank,
@@ -44,7 +44,7 @@ type pdef struct {
 
 func add2(x, y Array) (Array, error) {
 	ra := NewIntArray(x.Shape)
-	if x.Type==INT && y.Type==INT{
+	if x.Type == INT && y.Type == INT {
 		ra.Data = make([]int64, x.Length)
 		ra.Data.([]int64)[0] = x.Data.([]int64)[0] + y.Data.([]int64)[0]
 		return ra, nil
