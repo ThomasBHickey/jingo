@@ -32,22 +32,12 @@ const (
 	EDGE AType = MARK & ASGN & LPAR
 )
 
-//type ptCase struct { [4]IDType, [3]TOFunc, [2]int}
 type ptCase struct {
 	pattern        [4]AType
 	funcType       [2]Action
-	start, stop, q int
+	start, stop, q int  // don't know what q is yet
 }
 
-//const PTCases [1]ptCase = ptCase{pattern: {EDGE, VERB, NOUN, ANY}, funcType: {monad, vmonad}, start: 1, stop: 2, q: 1}
-
-type s struct{ i, j int }
-
-//const iss = {1,2}
-//var ctype = [128]CBType{
-var iss = [2]s{s{1, 2}, s{j: 0, i: 3}}
-
-//var PTCases=[1]ptCase{ptCase{{EDGE, VERB, NOUN, ANY}, {monad vmonad}, 1,2,1}}
 var ptCases [9]ptCase
 
 func init() {
