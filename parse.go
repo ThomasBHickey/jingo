@@ -35,7 +35,7 @@ const (
 type ptCase struct {
 	pattern        [4]AType
 	funcType       [2]Action
-	start, stop, q int  // don't know what q is yet
+	start, stop, q int // don't know what q is yet
 }
 
 var ptCases [9]ptCase

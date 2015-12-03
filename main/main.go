@@ -19,4 +19,5 @@ func main() {
 	for _, spd := range(snpdefs){
 		fmt.Println(spd)
 		}
+	jingo.Enqueue(snpdefs)
 }

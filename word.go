@@ -154,3 +154,11 @@ func Scan(text string) []snpdef {
 	}
 	return snpdefs
 }
+
+func Enqueue(snpdefs []snpdef) {
+	fmt.Println("In word.Enqueue")
+	for _,sp := range snpdefs {
+		val, ok := spellIn[sp.s]
+		fmt.Println("spellIn", val, ok)
+	}
+}
