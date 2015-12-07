@@ -26,13 +26,12 @@ func init() {
 	wtype['B'] = CB
 }
 
-// pst [256]int  // not clear what pst is used for
 var id2pdef = map[IDType]pdef{}
 
 type dyadFunct func(x, y Array) (rv Array, err error)
 type monadFunct func(x Array) (rv Array, err error)
 type pdef struct {
-	ptype AType
+	atype AType
 	Monad monadFunct
 	Dyad  dyadFunct
 	monadicRank,
@@ -42,11 +41,11 @@ type pdef struct {
 	spelling IDType
 }
 
-func add2(x, y Array) (Array, error) {
+func add2(x, w Array) (Array, error) {
 	ra := NewIntArray(x.Shape)
-	if x.Type == INT && y.Type == INT {
+	if x.Type == INT && w.Type == INT && x.Length == 1 && w.Length == 1 {
 		ra.Data = make([]int64, x.Length)
-		ra.Data.([]int64)[0] = x.Data.([]int64)[0] + y.Data.([]int64)[0]
+		ra.Data.([]int64)[0] = x.Data.([]int64)[0] + w.Data.([]int64)[0]
 		return ra, nil
 	}
 	return ra, errors.New("Unexpected arrays in add2")
@@ -65,6 +64,6 @@ func init() {
 	// f2 = add2
 	// res, _ := f2(1, 2)
 	// fmt.Println("f2: ", res)
-	id2pdef[CASGN] = pdef{ptype: ASGN, Dyad: asgn} // =.
-	id2pdef[CPLUS] = pdef{ptype: VERB, Dyad: add2} // +
+	id2pdef[CASGN] = pdef{atype: ASGN, Dyad: asgn} // =.
+	id2pdef[CPLUS] = pdef{atype: VERB, Dyad: add2} // +
 }

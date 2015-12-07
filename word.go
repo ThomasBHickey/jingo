@@ -1,7 +1,11 @@
+// Copyright 2015 Thomas B. Hickey
+// Use of this code is goverened by
+// license that can be found in the LICENSE file
 package jingo
 
 import (
 	"fmt"
+	//"unicode/utf8"
 )
 
 type CSType int // char state type
@@ -33,7 +37,7 @@ type sa struct {
 	new    CSType
 	effect EffType
 }
-type wp struct{ Start, End int } // word position
+
 var state = [10][9]sa{
 	/*SS */ {sa{SX, EN}, sa{SS, E0}, sa{SA, EN}, sa{SN, EN}, sa{SA, EN}, sa{S9, EN}, sa{SX, EN}, sa{SX, EN}, sa{SQ, EN}},
 	/*SX */ {sa{SX, EI}, sa{SS, EI}, sa{SA, EI}, sa{SN, EI}, sa{SA, EI}, sa{S9, EI}, sa{SX, E0}, sa{SX, E0}, sa{SQ, EI}},
@@ -61,13 +65,15 @@ func runeToWType(r rune) CBType {
 	}
 }
 
-type snpdef struct { // s and pdef
-	s  string
-	id IDType
-	pd pdef
-}
+// type snpdef struct { // s and pdef
+// 	s  string
+// 	id IDType
+// 	pd pdef
+// }
 
-func Scan(text string) []snpdef {
+type wp struct{ Start, End int } // word position
+
+func Scan(text string) []wp {
 	fmt.Println("In Scan", text)
 	nv := false    // numeric value being built
 	cs := SS       // current state
@@ -111,9 +117,9 @@ func Scan(text string) []snpdef {
 	}
 	//bpos = bpos+1
 	//fmt.Println("finished loop", "cs", cs, "t", t, "nv", nv, "xb", xb, "xe", xe, "b", b, "bpos", bpos)
-	snpdefs := []snpdef{}
+	//snpdefs := []snpdef{}
 	if cs == SQ {
-		return snpdefs // needs error condition
+		return wps // needs error condition
 	}
 	t = t && (cs == S9)
 	if t {
@@ -134,31 +140,76 @@ func Scan(text string) []snpdef {
 			fmt.Println("emit 5:", b, len(text), text[b:len(text)])
 		}
 	}
+	// for _, wp := range wps {
+	// 	s := text[wp.Start:wp.End]
+	// 	fmt.Println("wp", s)
+	// 	if len(s) >= 0 {
+	// 		c0 := []rune(s)[0]
+	// 		fmt.Println("wtype", c0, runeToWType(c0), "spellin", spellIn[s])
+	// 		id := spellIn[s]
+	// 		pdef, ok := id2pdef[id]
+	// 		snpdefs = append(snpdefs, snpdef{s: s, id: id, pd: pdef})
+	// 		if ok {
+	// 			dyres, _ := pdef.Dyad(Array{}, Array{})
+	// 			fmt.Println("pdef dyres", dyres)
+	// 		}
+	// 	}
+	// }
+	// for _, sp := range snpdefs {
+	// 	fmt.Println("s", sp.s, "id", spellOut[sp.id], "pd", sp.pd)
+	// }
+	return wps
+}
+
+func Enqueue(wps []wp, text string) ([]Array, EventType) {
+	fmt.Println("In word.Enqueue")
+	queue := []Array{}
+	var y pdef
+	var b bool
 	for _, wp := range wps {
-		s := text[wp.Start:wp.End]
-		fmt.Println("wp", s)
-		if len(s) >= 0 {
-			c0 := []rune(s)[0]
-			fmt.Println("wtype", c0, runeToWType(c0), "spellin", spellIn[s])
-			id := spellIn[s]
-			pdef, ok := id2pdef[id]
-			snpdefs = append(snpdefs, snpdef{s: s, id: id, pd: pdef})
-			if ok {
-				dyres, _ := pdef.Dyad(Array{}, Array{})
-				fmt.Println("pdef dyres", dyres)
+		s := text[wp.Start:wp.End] // string in utf-8
+		runes := ([]rune)(s)
+		wl := len(runes)
+		fmt.Println("s:", s, "wlength wl", wl)
+		c := runes[0]
+		e := IDType(c)
+		p := runeToCType(c)
+		fmt.Println("p: ctype[firstchar]", p)
+		if wl > 1 {
+			d := runes[len(runes)-1]
+			fmt.Println("d last char", d)
+			if b = p != C9 && (ESCType(d) == CESC1 || ESCType(d) == CESC2); b {
+				e = spellIn[s]
+				fmt.Println("b is true, e:", e)
+			}
+		}
+		if c < 128 {
+			y = id2pdef[e]
+		}
+		if y.atype != NoAType {
+			fmt.Println("Found pdef1", y)
+		} else if b {
+			fmt.Println("UNEXPECTED b?")
+		} else {
+			switch p {
+			case C9:
+				x := connum(s)
+				if x.atype==NoAType {
+					return (queue, 0)
+				}
+				queue = append(queue, x)
+			case CQ:
+				x, err := constr(s)
+				if err {
+					return queue, err
+				}
+				queue = append(queue, x)
+			default:
+				jsignal2(EVSPELL, wp)
+				return queue, EVSPELL
 			}
 		}
 	}
-	for _, sp := range snpdefs {
-		fmt.Println("s", sp.s, "id", spellOut[sp.id], "pd", sp.pd)
-	}
-	return snpdefs
-}
-
-func Enqueue(snpdefs []snpdef) {
-	fmt.Println("In word.Enqueue")
-	for _,sp := range snpdefs {
-		val, ok := spellIn[sp.s]
-		fmt.Println("spellIn", val, ok)
-	}
+	fmt.Println("queue", queue)
+	return queue, 0
 }

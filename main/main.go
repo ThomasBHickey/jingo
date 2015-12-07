@@ -14,10 +14,11 @@ func main() {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print("> ")
 	text, _ := reader.ReadString('\n')
-	snpdefs :=jingo.Scan(strings.TrimSpace(text))
-	fmt.Println("snpdefs", snpdefs)
-	for _, spd := range(snpdefs){
-		fmt.Println(spd)
+	ttext := strings.TrimSpace(text)
+	wps :=jingo.Scan(ttext)
+	fmt.Println("wps")
+	for _, w := range(wps){
+		fmt.Println(text[w.Start:w.End])
 		}
-	jingo.Enqueue(snpdefs)
+	jingo.Enqueue(wps, ttext)
 }

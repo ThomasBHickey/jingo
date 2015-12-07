@@ -27,9 +27,9 @@ const (
 )
 
 const (
-	AVN  AType = ADV & VERB & NOUN
-	CAVN AType = CONJ & ADV & VERB & NOUN
-	EDGE AType = MARK & ASGN & LPAR
+	AVN  AType = ADV | VERB | NOUN
+	CAVN AType = CONJ | ADV | VERB | NOUN
+	EDGE AType = MARK | ASGN | LPAR
 )
 
 type ptCase struct {

@@ -19,12 +19,16 @@ const (
 	CQ               //8            /* quote                                   */
 )
 
+//go:generate stringer -type=CBType
+
 type ESCType int
 
 const (
 	CESC1 ESCType = '.' /*  46 056 2e     1st escape char          */
 	CESC2         = ':' /*  58 072 3a     2nd escape char*/
 )
+
+//go:generate stringer -type=ESCType
 
 type IDType int
 
@@ -213,6 +217,8 @@ const (
 
 	CFF IDType = 0377 /* 255 377 ff                              */
 )
+
+//go:generate stringer -type=IDType
 
 // func init() {
 // 	fmt.Println("in jc.go")
