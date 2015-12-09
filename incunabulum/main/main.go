@@ -1,4 +1,3 @@
-
 // http://www.jsoftware.com/jwiki/Essays/Incunabulum
 // One summer weekend in 1989, Arthur Whitney visited Ken Iverson at Kiln Farm
 // and produced—on one page and in one afternoon—an interpreter fragment on the
@@ -10,9 +9,28 @@
 // Arthur's one-page interpreter fragment is as follows:
 // Contributed by RogerHui. From An Implementation of J, Appendix A: Incunabulum, 1992-01-27.
 
+package main
+
+import (
+	"fmt"
+)
 
 // typedef char C;typedef long I;
 // typedef struct a{I t,r,d[3],p[2];}*A;
+type Vector interface{}
+type Array struct {
+	Type   AType
+	Length int
+	Shape  []int
+	Data   Vector
+}
+type AType int
+
+const (
+	IntArray AType = iota
+	BoxArray
+)
+
 // #define P printf
 // #define R return
 // #define V1(f) A f(w)A w;
@@ -20,9 +38,33 @@
 // #define DO(n,x) {I i=0,_n=(n);for(;i<_n;++i){x;}}
 // I *ma(n){R(I*)malloc(n*4);}mv(d,s,n)I *d,*s;{DO(n,d[i]=s[i]);}
 // tr(r,d)I *d;{I z=1;DO(r,z=z*d[i]);R z;}
+func size(shape []int) int {
+	sz := 1
+	for _, sp := range shape {
+		sz *= sp
+	}
+	return sz
+}
+
+
 // A ga(t,r,d)I *d;{A z=(A)ma(5+tr(r,d));z->t=t,z->r=r,mv(z->d,d,r);
 //  R z;}
+func getArray(typ AType, shape []int) (na Array) {
+	na.Type = typ
+	na.Length = size(shape)
+	na.Data = make([]int, na.Length)
+	//a := Array{typ, size(shape), shape, v}
+	return
+}
 // V1(iota){I n=*w->p;A z=ga(0,1,&n);DO(n,z->p[i]=i);R z;}
+func iot(w Array)(z Array){
+	n := w.Data.([]int)[0]
+	d := make([]int, n)
+	z = getArray(0, []int{n})
+	for i:=0; i<n; i++ {d[i]=i}
+	z.Data = d
+	return
+}
 // V2(plus){I r=w->r,*d=w->d,n=tr(r,d);A z=ga(0,r,d);
 //  DO(n,z->p[i]=a->p[i]+w->p[i]);R z;}
 // V2(from){I r=w->r-1,*d=w->d+1,n=tr(r,d);
