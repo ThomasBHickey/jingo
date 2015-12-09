@@ -12,7 +12,10 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"os"
+	"strings"
 )
 
 // typedef char C;typedef long I;
@@ -46,7 +49,6 @@ func size(shape []int) int {
 	return sz
 }
 
-
 // A ga(t,r,d)I *d;{A z=(A)ma(5+tr(r,d));z->t=t,z->r=r,mv(z->d,d,r);
 //  R z;}
 func getArray(typ AType, shape []int) (na Array) {
@@ -56,15 +58,23 @@ func getArray(typ AType, shape []int) (na Array) {
 	//a := Array{typ, size(shape), shape, v}
 	return
 }
+
 // V1(iota){I n=*w->p;A z=ga(0,1,&n);DO(n,z->p[i]=i);R z;}
-func iot(w Array)(z Array){
+func iot(w Array) (z Array) { // iota conflicts with Go
 	n := w.Data.([]int)[0]
 	d := make([]int, n)
 	z = getArray(0, []int{n})
-	for i:=0; i<n; i++ {d[i]=i}
+	for i := 0; i < n; i++ {
+		d[i] = i
+	}
 	z.Data = d
 	return
 }
+func plus(a, w Array) (z Array) {
+	fmt.Println("Plus not implemented yet")
+	return z
+}
+
 // V2(plus){I r=w->r,*d=w->d,n=tr(r,d);A z=ga(0,r,d);
 //  DO(n,z->p[i]=a->p[i]+w->p[i]);R z;}
 // V2(from){I r=w->r-1,*d=w->d+1,n=tr(r,d);
@@ -79,10 +89,19 @@ func iot(w Array)(z Array){
 // V1(sha){A z=ga(0,1,&w->r);mv(z->p,w->d,w->r);R z;}
 // V1(id){R w;}V1(size){A z=ga(0,0,0);*z->p=w->r?*w->d:1;R z;}
 // pi(i){P("%d ",i);}nl(){P("\n");}
+func printInt(i int) {
+	fmt.Print(i)
+}
+func newLine() {
+	fmt.Println()
+}
+
 // pr(w)A w;{I r=w->r,*d=w->d,n=tr(r,d);DO(r,pi(d[i]));nl();
 //  if(w->t)DO(n,P("< ");pr(w->p[i]))else DO(n,pi(w->p[i]));nl();}
 
 // C vt[]="+{~<#,";
+var vt = "+{~<#,"
+
 // A(*vd[])()={0,plus,from,find,0,rsh,cat},
 //  (*vm[])()={0,id,size,iota,box,sha,0};
 // I st[26]; qp(a){R  a>='a'&&a<='z';}qv(a){R a<'a';}
@@ -95,3 +114,15 @@ func iot(w Array)(z Array){
 //  DO(n,e[i]=(a=noun(c=s[i]))?a:(a=verb(c))?a:c);e[n]=0;R e;}
 
 // main(){C s[99];while(gets(s))pr(ex(wd(s)));}
+func getString(reader *bufio.Reader) string {
+	fmt.Print("> ")
+	text, _ := reader.ReadString('\n')
+	return strings.TrimSpace(text)
+}
+func main() {
+	//fmt.Println("In Main")
+	reader := bufio.NewReader(os.Stdin)
+	for {
+		print(execute(words(getString(reader))))
+	}
+}
