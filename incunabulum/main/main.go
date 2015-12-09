@@ -38,6 +38,9 @@ const (
 // #define R return
 // #define V1(f) A f(w)A w;
 // #define V2(f) A f(a,w)A a,w;
+type vMonad func(x Array) Array
+type vDyad func(x, y Array) Array
+
 // #define DO(n,x) {I i=0,_n=(n);for(;i<_n;++i){x;}}
 // I *ma(n){R(I*)malloc(n*4);}mv(d,s,n)I *d,*s;{DO(n,d[i]=s[i]);}
 // tr(r,d)I *d;{I z=1;DO(r,z=z*d[i]);R z;}
@@ -98,22 +101,53 @@ func newLine() {
 
 // pr(w)A w;{I r=w->r,*d=w->d,n=tr(r,d);DO(r,pi(d[i]));nl();
 //  if(w->t)DO(n,P("< ");pr(w->p[i]))else DO(n,pi(w->p[i]));nl();}
-
+func print(w Array){
+	fmt.Println("Just called 'print'")
+}
 // C vt[]="+{~<#,";
 var vt = "+{~<#,"
 
 // A(*vd[])()={0,plus,from,find,0,rsh,cat},
 //  (*vm[])()={0,id,size,iota,box,sha,0};
+var vDyads = []vDyad{}
+var vMonads = []vMonad{nil, iot, iot}
+
 // I st[26]; qp(a){R  a>='a'&&a<='z';}qv(a){R a<'a';}
+var stack [26]int
+
+func isAlpha(a rune) bool { return a >= 'a' && a <= 'z' }
+func isOp(a rune) bool    { return a < 'a' }
+
 // A ex(e)I *e;{I a=*e;
 //  if(qp(a)){if(e[1]=='=')R st[a-'a']=ex(e+2);a= st[ a-'a'];}
 //  R qv(a)?(*vm[a])(ex(e+1)):e[1]?(*vd[e[1]])(a,ex(e+2)):(A)a;}
+func execute(e Array)(z Array) {
+	fmt.Println("just called execute")
+	return
+}
 // noun(c){A z;if(c<'0'||c>'9')R 0;z=ga(0,0,0);*z->p=c-'0';R z;}
+func mkNoun(c rune)(z Array, ok bool){
+	if c<'0' || c>'9' {ok=false; return}
+	z = getArray(0, []int{1})
+	z.Data = make([]int,1)
+	z.Data.([]int)[0] = int(c-'0')
+	return
+}
 // verb(c){I i=0;for(;vt[i];)if(vt[i++]==c)R i;R 0;}
+func verbPos(ct rune) int {
+	for i,c := range(vt) {
+		if c==ct { return i}
+	}
+	return 0
+}
 // I *wd(s)C *s;{I a,n=strlen(s),*e=ma(n+1);C c;
 //  DO(n,e[i]=(a=noun(c=s[i]))?a:(a=verb(c))?a:c);e[n]=0;R e;}
-
+func words(s string)(z Array){
+	fmt.Println("just called words")
+	return
+}
 // main(){C s[99];while(gets(s))pr(ex(wd(s)));}
+
 func getString(reader *bufio.Reader) string {
 	fmt.Print("> ")
 	text, _ := reader.ReadString('\n')
