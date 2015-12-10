@@ -32,6 +32,7 @@ type AType int
 const (
 	IntArray AType = iota
 	BoxArray
+	VerbArray
 )
 
 // #define P printf
@@ -58,8 +59,12 @@ func getArray(typ AType, shape []int) (na Array) {
 	na.Type = typ
 	na.Length = size(shape)
 	na.Data = make([]int, na.Length)
-	//a := Array{typ, size(shape), shape, v}
 	return
+}
+func getIntArray(typ AType, i int) Array {
+	na := getArray(typ, []int{1})
+	na.Data = i
+	return na
 }
 
 // V1(iota){I n=*w->p;A z=ga(0,1,&n);DO(n,z->p[i]=i);R z;}
@@ -92,7 +97,7 @@ func plus(a, w Array) (z Array) {
 // V1(sha){A z=ga(0,1,&w->r);mv(z->p,w->d,w->r);R z;}
 // V1(id){R w;}V1(size){A z=ga(0,0,0);*z->p=w->r?*w->d:1;R z;}
 // pi(i){P("%d ",i);}nl(){P("\n");}
-func printInt(i int) {
+func prInt(i int) {
 	fmt.Print(i)
 }
 func newLine() {
@@ -101,9 +106,25 @@ func newLine() {
 
 // pr(w)A w;{I r=w->r,*d=w->d,n=tr(r,d);DO(r,pi(d[i]));nl();
 //  if(w->t)DO(n,P("< ");pr(w->p[i]))else DO(n,pi(w->p[i]));nl();}
-func print(w Array){
-	fmt.Println("Just called 'print'")
+func pr(w Array) {
+	fmt.Println("Just called 'pr'")
+	for _, d := range w.Shape {
+		prInt(d)
+	}
+	newLine()
+	switch w.Type {
+	case IntArray:
+		for i := 0; i < w.Length; i++ {
+			prInt(w.Data.([]int)[i])
+		}
+		newLine()
+	case BoxArray:
+		for i := 0; i < w.Length; i++ {
+			pr(w.Data.([]Array)[i])
+		}
+	}
 }
+
 // C vt[]="+{~<#,";
 var vt = "+{~<#,"
 
@@ -115,37 +136,57 @@ var vMonads = []vMonad{nil, iot, iot}
 // I st[26]; qp(a){R  a>='a'&&a<='z';}qv(a){R a<'a';}
 var stack [26]int
 
-func isAlpha(a rune) bool { return a >= 'a' && a <= 'z' }
-func isOp(a rune) bool    { return a < 'a' }
+func isAlpha(a byte) bool { return a >= 'a' && a <= 'z' }
+func isOp(a byte) bool    { return a < 'a' }
 
 // A ex(e)I *e;{I a=*e;
 //  if(qp(a)){if(e[1]=='=')R st[a-'a']=ex(e+2);a= st[ a-'a'];}
 //  R qv(a)?(*vm[a])(ex(e+1)):e[1]?(*vd[e[1]])(a,ex(e+2)):(A)a;}
-func execute(e Array)(z Array) {
+func execute(e Array) (z Array) {
 	fmt.Println("just called execute")
 	return
 }
+
 // noun(c){A z;if(c<'0'||c>'9')R 0;z=ga(0,0,0);*z->p=c-'0';R z;}
-func mkNoun(c rune)(z Array, ok bool){
-	if c<'0' || c>'9' {ok=false; return}
-	z = getArray(0, []int{1})
-	z.Data = make([]int,1)
-	z.Data.([]int)[0] = int(c-'0')
-	return
-}
-// verb(c){I i=0;for(;vt[i];)if(vt[i++]==c)R i;R 0;}
-func verbPos(ct rune) int {
-	for i,c := range(vt) {
-		if c==ct { return i}
+func mkNoun(c byte) (z Array, ok bool) {
+	if c < '0' || c > '9' {
+		return z, false
 	}
-	return 0
+	z = getArray(0, []int{1})
+	z.Data = make([]int, 1)
+	z.Data.([]int)[0] = int(c - '0')
+	return z, true
 }
+
+// verb(c){I i=0;for(;vt[i];)if(vt[i++]==c)R i;R 0;}
+func verbPos(ct byte) (pos int, ok bool) {
+	pos = strings.IndexByte(vt, ct)
+	if pos < 0 {
+		return 0, false
+	}
+	return pos, true
+}
+
 // I *wd(s)C *s;{I a,n=strlen(s),*e=ma(n+1);C c;
 //  DO(n,e[i]=(a=noun(c=s[i]))?a:(a=verb(c))?a:c);e[n]=0;R e;}
-func words(s string)(z Array){
+func words(s string) (z Array) {
 	fmt.Println("just called words")
+	n := len(s)
+	e := make([]int, n+1)
+	for i := 0; i < n; i++ {
+		c := s[i]
+		if a, ok := mkNoun(c); ok {
+			return a
+		}
+		if a, ok := verbPos(c); ok {
+			return getIntArray(VerbArray, a)
+		}
+		e[n] = 0
+	}
+	z.Data = e
 	return
 }
+
 // main(){C s[99];while(gets(s))pr(ex(wd(s)));}
 
 func getString(reader *bufio.Reader) string {
@@ -157,6 +198,6 @@ func main() {
 	//fmt.Println("In Main")
 	reader := bufio.NewReader(os.Stdin)
 	for {
-		print(execute(words(getString(reader))))
+		pr(execute(words(getString(reader))))
 	}
 }
