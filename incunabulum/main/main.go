@@ -33,6 +33,7 @@ const (
 	IntArray AType = iota
 	BoxArray
 	VerbArray
+	ZeroArray
 )
 
 // #define P printf
@@ -132,7 +133,6 @@ var vt = "+{~<#,"
 //  (*vm[])()={0,id,size,iota,box,sha,0};
 var vDyads = []vDyad{}
 var vMonads = []vMonad{nil, iot, iot}
-
 // I st[26]; qp(a){R  a>='a'&&a<='z';}qv(a){R a<'a';}
 var stack [26]int
 
@@ -143,7 +143,7 @@ func isOp(a byte) bool    { return a < 'a' }
 //  if(qp(a)){if(e[1]=='=')R st[a-'a']=ex(e+2);a= st[ a-'a'];}
 //  R qv(a)?(*vm[a])(ex(e+1)):e[1]?(*vd[e[1]])(a,ex(e+2)):(A)a;}
 func execute(e Array) (z Array) {
-	fmt.Println("just called execute")
+	fmt.Println("just called execute", e)
 	return
 }
 
@@ -172,18 +172,20 @@ func verbPos(ct byte) (pos int, ok bool) {
 func words(s string) (z Array) {
 	fmt.Println("just called words")
 	n := len(s)
-	e := make([]int, n+1)
+	e := make([]Array, n+1)
 	for i := 0; i < n; i++ {
 		c := s[i]
 		if a, ok := mkNoun(c); ok {
-			return a
+			fmt.Println("wordsA", a)
+			e[i]=a
+		}else if a, ok := verbPos(c); ok {
+			fmt.Println("wordsB", getIntArray(VerbArray, a))
+			e[i] = getIntArray(VerbArray, a)
 		}
-		if a, ok := verbPos(c); ok {
-			return getIntArray(VerbArray, a)
-		}
-		e[n] = 0
 	}
+	e[n] = getIntArray(ZeroArray, 0)
 	z.Data = e
+	fmt.Println("wordsC", z)
 	return
 }
 
@@ -198,6 +200,11 @@ func main() {
 	//fmt.Println("In Main")
 	reader := bufio.NewReader(os.Stdin)
 	for {
+		w := words(getString(reader))
+		fmt.Println("words:", w)
+		execute(w)
+		break
+		//if w=="quit" || w=="exit"{break}
 		pr(execute(words(getString(reader))))
 	}
 }
