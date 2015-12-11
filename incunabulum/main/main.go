@@ -32,7 +32,7 @@ type AType int
 const (
 	IntArray AType = iota
 	BoxArray
-	VerbArray
+	VNValue // VerbNoun
 	//ZeroArray
 )
 
@@ -64,14 +64,19 @@ func getArray(typ AType, shape []int) (na Array) {
 }
 func getIntArray(typ AType, i int) Array {
 	na := getArray(typ, []int{1})
-	na.Data = i
+	na.Data = []int{i}
+	return na
+}
+func getVNValue(vn int) Array {
+	na := getArray(VNValue, []int{1})
+	na.Data = vn
 	return na
 }
 
 // V1(iota){I n=*w->p;A z=ga(0,1,&n);DO(n,z->p[i]=i);R z;}
 func iot(w Array) (z Array) { // iota conflicts with Go
 	fmt.Println("iot:", w)
-	n := w.Data.([]int)[0]
+	n := w.Data.(int)
 	d := make([]int, n)
 	z = getArray(0, []int{n})
 	for i := 0; i < n; i++ {
@@ -80,6 +85,10 @@ func iot(w Array) (z Array) { // iota conflicts with Go
 	z.Data = d
 	fmt.Println("iot returning", z)
 	return
+}
+func asgn(a, w Array) (z Array) {
+	fmt.Println("asgn", a, w)
+	return z
 }
 func plus(a, w Array) (z Array) {
 	fmt.Println("Plus not implemented yet")
@@ -110,7 +119,7 @@ func newLine() {
 // pr(w)A w;{I r=w->r,*d=w->d,n=tr(r,d);DO(r,pi(d[i]));nl();
 //  if(w->t)DO(n,P("< ");pr(w->p[i]))else DO(n,pi(w->p[i]));nl();}
 func pr(w Array) {
-	fmt.Println("Just called 'pr'")
+	//fmt.Println("Just called 'pr'")
 	for _, d := range w.Shape {
 		prInt(d)
 	}
@@ -118,10 +127,11 @@ func pr(w Array) {
 	switch w.Type {
 	case IntArray:
 		for i := 0; i < w.Length; i++ {
-			prInt(w.Data.([]int)[i])
+			prInt(w.Data.([]int)[0])
 		}
 		newLine()
 	case BoxArray:
+		fmt.Print("< ")
 		for i := 0; i < w.Length; i++ {
 			pr(w.Data.([]Array)[i])
 		}
@@ -137,7 +147,7 @@ var vDyads = []vDyad{}
 var vMonads = []vMonad{nil, iot, iot}
 
 // I st[26]; qp(a){R  a>='a'&&a<='z';}qv(a){R a<'a';}
-var stack [26]int
+var st [26]Array
 
 func isAlpha(a byte) bool { return a >= 'a' && a <= 'z' }
 func isOp(a byte) bool    { return a < 'a' }
@@ -151,17 +161,32 @@ func execute(e Array) (z Array) {
 	case BoxArray:
 		fmt.Println("Found BoxArray")
 		a := e.Data.([]Array)[0]
-		fmt.Println("unboxed", a)
+		b := e.Data.([]Array)[1]
+		fmt.Println("unboxed a&b:", a, b)
+		if b.Type == VNValue && b.Data.(int) == int('=') {
+			fmt.Println("found asgn")
+			z = getArray(BoxArray, []int{e.Length - 2})
+			z.Data = e.Data.([]Array)[2:]
+			res := execute(z)
+			st[a.Data.(int)-'a'] = res
+			return res
+		}
 		switch a.Type {
 		case IntArray:
 			fmt.Println("IntArray", a.Data)
-		case VerbArray:
-			fmt.Println("VerbArray", a.Data, string(vt[a.Data.(int)]))
-			return vMonads[a.Data.(int)](execute(e.Data.([]Array)[1]))
+			return a
+		case VNValue:
+			fmt.Println("VerbArray", a.Data, string(vt[a.Data.([]int)[0]]))
+			return vMonads[a.Data.([]int)[0]](execute(e.Data.([]Array)[1]))
 		default:
 			fmt.Println("Unexpected array type", a.Type)
 		}
-	case IntArray: return e
+	case IntArray:
+		fmt.Println("executing IntArray", e)
+		return e
+	case VNValue:
+		fmt.Println("return VNValue")
+		return e
 	default:
 		fmt.Println("execute of unknown type", e.Type)
 	}
@@ -173,10 +198,11 @@ func mkNoun(c byte) (z Array, ok bool) {
 	if c < '0' || c > '9' {
 		return z, false
 	}
-	z = getArray(0, []int{1})
-	z.Data = make([]int, 1)
-	z.Data.([]int)[0] = int(c - '0')
-	return z, true
+	return getVNValue(int(c-'0')), true
+	// z = getArray(0, []int{1})
+	// z.Data = make([]int, 1)
+	// z.Data.([]int)[0] = int(c - '0')
+	// return z, true
 }
 
 // verb(c){I i=0;for(;vt[i];)if(vt[i++]==c)R i;R 0;}
@@ -193,22 +219,26 @@ func verbPos(ct byte) (pos int, ok bool) {
 func words(s string) (z Array) {
 	fmt.Println("just called words")
 	n := len(s)
-	e := make([]Array, n) // no longer need extra for zero
+	e := make([]Array, n+1) // extra needed for look ahead
 	for i := 0; i < n; i++ {
 		c := s[i]
+		fmt.Println("looking at", c, string(c))
 		if a, ok := mkNoun(c); ok {
-			fmt.Println("wordsA", a)
 			e[i] = a
+			fmt.Println("wordsA", e[i])
 		} else if a, ok := verbPos(c); ok {
-			fmt.Println("wordsB", getIntArray(VerbArray, a))
-			e[i] = getIntArray(VerbArray, a)
+			e[i] = getIntArray(VNValue, a)
+			fmt.Println("wordsB", e[i])
+		} else {
+			e[i] = getIntArray(IntArray, int(c))
+			fmt.Println("wordsC", e[i])
 		}
 	}
 	//e[n] = getIntArray(ZeroArray, 0)
 	z.Type = BoxArray
 	z.Length = n
 	z.Data = e
-	fmt.Println("wordsC", z)
+	fmt.Println("wordsDone", z)
 	return
 }
 
@@ -226,7 +256,18 @@ func main() {
 		//w := words(getString(reader))
 		w := words("~3")
 		fmt.Println("words:", w)
+		pr(w)
 		res := execute(w)
+		fmt.Println("Result:", res)
+		pr(res)
+		w = words("a=1")
+		fmt.Println("words:", w)
+		res = execute(w)
+		fmt.Println("Result:", res)
+		pr(res)
+		fmt.Println("a")
+		w = words("a")
+		res = execute(w)
 		fmt.Println("Result:", res)
 		pr(res)
 		break
