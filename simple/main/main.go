@@ -94,8 +94,8 @@ func dasgn(a, w A) (na A) {
 	return
 }
 func dplus(a, w A) (na A) {
-	fmt.Println("dplus a",a, "dplus w", w)
-	if a.Type==Loc{
+	fmt.Println("dplus a", a, "dplus w", w)
+	if a.Type == Loc {
 		a = st[a.Data.(int)]
 	}
 	if len(a.Shape) == 0 && len(w.Shape) == 0 {
@@ -106,7 +106,7 @@ func dplus(a, w A) (na A) {
 		nd := make([]int, w.Length)
 		od := w.Data.([]int)
 		for i := 0; i < w.Length; i++ {
-			nd[i] = av+od[i]
+			nd[i] = av + od[i]
 		}
 		na.Type = Value
 		na.Shape = w.Shape
