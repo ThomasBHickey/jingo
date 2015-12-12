@@ -33,6 +33,7 @@ const (
 	IntArray AType = iota
 	BoxArray
 	VNValue // VerbNoun
+	Location
 	//ZeroArray
 )
 
@@ -229,6 +230,9 @@ func words(s string) (z Array) {
 		} else if a, ok := verbPos(c); ok {
 			e[i] = getIntArray(VNValue, a)
 			fmt.Println("wordsB", e[i])
+		} else if isAlpha(c){
+			e[i] = getLocation(c-'a')
+		}
 		} else {
 			e[i] = getIntArray(IntArray, int(c))
 			fmt.Println("wordsC", e[i])
