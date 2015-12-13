@@ -1,5 +1,9 @@
 // My attempt at a simple interpreter
+// modeled on Arthur Whitney's 1 page interpreter that
+// inspired the J implementation
 // Copyright Thomas B. Hickey 2015
+// See license.txt in github.com/ThomasBHickey/jingo
+
 package main
 
 import (
