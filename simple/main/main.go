@@ -93,6 +93,36 @@ func dasgn(a, w A) (na A) {
 	}
 	return
 }
+func dcat(a, w A) A {
+	fmt.Println("dcat not implemented")
+	return w
+}
+func dinsert(a, w A) (na A) {
+	//fmt.Println("dinsert a", a, "dinsert w", w)
+	if w.Length == 0 {
+		return w
+	}
+	if a.Type != Op {
+		fmt.Println("dinsert expected op")
+		return w
+	}
+	if vt[a.Data.(int)] != '+' {
+		fmt.Println("Unexpected op to dinsert", a.Data)
+		return w
+	}
+	//fmt.Println("dinsert found +")
+	if len(w.Shape) == 0 {
+		return w
+	}
+	na.Type = Value
+	na.Shape = []int{}
+	rv := 0
+	for _, v := range w.Data.([]int) {
+		rv += v
+	}
+	na.Data = rv
+	return
+}
 func dplus(a, w A) (na A) {
 	fmt.Println("dplus a", a, "dplus w", w)
 	if a.Type == Loc {
@@ -117,9 +147,24 @@ func dplus(a, w A) (na A) {
 	fmt.Println("dplus not complete")
 	return
 }
-func mplus(a A) (na A) {
-	fmt.Println("mplus not yet implemented")
-	return
+func mbox(a A) A {
+	fmt.Println("mbox not implemented")
+	return a
+}
+func mid(a A) A {
+	return a
+}
+func minsert(a A) A {
+	fmt.Println("minsert", a)
+	return a
+}
+func mrank(a A) A {
+	//fmt.Println("mrank", a)
+	na := mkA(Value, []int{})
+	na.Shape = make([]int, len(a.Shape))
+	na.Length = len(a.Shape)
+	na.Data = len(a.Shape)
+	return na
 }
 func newLine() {
 	fmt.Println()
@@ -158,9 +203,9 @@ func pr(w A) {
 	}
 }
 
-var vt = "=+{~<#,"
-var vDyads = []vDyad{dasgn, dplus, nil, diot, nil, nil}
-var vMonads = []vMonad{nil, mplus, nil, miot}
+var vt = "=+{~<#,/"
+var vDyads = []vDyad{dasgn, dplus, nil, diot, nil, nil, dcat, dinsert}
+var vMonads = []vMonad{nil, mid, nil, miot, mbox, mrank, nil, minsert}
 var st [26]A
 
 func ex(e A) (z A) {
@@ -182,9 +227,21 @@ func ex(e A) (z A) {
 		} else {
 			a := e.Data.([]A)[0]
 			b := e.Data.([]A)[1]
+			if a.Type == Op && b.Type == Op { // adverb
+				rest := mkA(Box, []int{e.Length - 2})
+				rest.Data = e.Data.([]A)[2:]
+				if vt[b.Data.(int)] == '/' {
+					return dinsert(a, ex(rest))
+				}
+				fmt.Println("expected /")
+				return
+			}
 			if a.Type == Op { // monad
 				rest := mkA(Box, []int{e.Length - 1})
 				rest.Data = e.Data.([]A)[1:]
+				if b.Type == Op {
+					return vDyads[b.Data.(int)](a, rest)
+				}
 				return vMonads[a.Data.(int)](ex(rest))
 			}
 			if b.Type == Op {
