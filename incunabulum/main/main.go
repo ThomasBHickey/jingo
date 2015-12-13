@@ -1,13 +1,8 @@
-// http://www.jsoftware.com/jwiki/Essays/Incunabulum
-// One summer weekend in 1989, Arthur Whitney visited Ken Iverson at Kiln Farm
-// and produced—on one page and in one afternoon—an interpreter fragment on the
-// AT&T 3B1 computer. I studied this interpreter for about a week for its
-// organization and programming style; and on Sunday, August 27, 1989, at about
-// four o'clock in the afternoon, wrote the first line of code that became the
-// implementation described in this document.
-
-// Arthur's one-page interpreter fragment is as follows:
-// Contributed by RogerHui. From An Implementation of J, Appendix A: Incunabulum, 1992-01-27.
+// My attempt at a simple interpreter
+// modeled on Arthur Whitney's 1 page interpreter that
+// inspired the J implementation
+// Copyright Thomas B. Hickey 2015
+// See license.txt in github.com/ThomasBHickey/jingo
 
 package main
 
@@ -18,195 +13,254 @@ import (
 	"strings"
 )
 
-// typedef char C;typedef long I;
-// typedef struct a{I t,r,d[3],p[2];}*A;
-type Vector interface{}
-type Array struct {
-	Type   AType
-	Length int
-	Shape  []int
-	Data   Vector
-}
+type V interface{}
 type AType int
 
 const (
-	IntArray AType = iota
-	BoxArray
-	VNValue // VerbNoun
-	Location
-	//ZeroArray
+	Loc AType = iota
+	Op
+	Value
+	Box
 )
 
-// #define P printf
-// #define R return
-// #define V1(f) A f(w)A w;
-// #define V2(f) A f(a,w)A a,w;
-type vMonad func(x Array) Array
-type vDyad func(x, y Array) Array
+type A struct {
+	Type   AType
+	Length int
+	Shape  []int
+	Data   V
+}
+type vMonad func(x A) A
+type vDyad func(x, y A) A
 
-// #define DO(n,x) {I i=0,_n=(n);for(;i<_n;++i){x;}}
-// I *ma(n){R(I*)malloc(n*4);}mv(d,s,n)I *d,*s;{DO(n,d[i]=s[i]);}
-// tr(r,d)I *d;{I z=1;DO(r,z=z*d[i]);R z;}
-func size(shape []int) int {
+func ASize(shape []int) int {
 	sz := 1
 	for _, sp := range shape {
 		sz *= sp
 	}
 	return sz
 }
-
-// A ga(t,r,d)I *d;{A z=(A)ma(5+tr(r,d));z->t=t,z->r=r,mv(z->d,d,r);
-//  R z;}
-func getArray(typ AType, shape []int) (na Array) {
-	na.Type = typ
-	na.Length = size(shape)
-	na.Data = make([]int, na.Length)
-	return
-}
-func getIntArray(typ AType, i int) Array {
-	na := getArray(typ, []int{1})
-	na.Data = []int{i}
-	return na
-}
-func getVNValue(vn int) Array {
-	na := getArray(VNValue, []int{1})
-	na.Data = vn
-	return na
-}
-
-// V1(iota){I n=*w->p;A z=ga(0,1,&n);DO(n,z->p[i]=i);R z;}
-func iot(w Array) (z Array) { // iota conflicts with Go
-	fmt.Println("iot:", w)
-	n := w.Data.(int)
-	d := make([]int, n)
-	z = getArray(0, []int{n})
-	for i := 0; i < n; i++ {
-		d[i] = i
+func mkA(atype AType, shape []int) (na A) {
+	na.Type = atype
+	na.Length = ASize(shape)
+	na.Shape = shape
+	if na.Length > 0 {
+		na.Data = make([]int, na.Length)
+	} else {
+		na.Data = 0
 	}
-	z.Data = d
-	fmt.Println("iot returning", z)
 	return
 }
-func asgn(a, w Array) (z Array) {
-	fmt.Println("asgn", a, w)
-	return z
-}
-func plus(a, w Array) (z Array) {
-	fmt.Println("Plus not implemented yet")
-	return z
+func mkIntA(typ AType, i int) (na A) {
+	na = mkA(typ, []int{})
+	na.Data = i
+	return
 }
 
-// V2(plus){I r=w->r,*d=w->d,n=tr(r,d);A z=ga(0,r,d);
-//  DO(n,z->p[i]=a->p[i]+w->p[i]);R z;}
-// V2(from){I r=w->r-1,*d=w->d+1,n=tr(r,d);
-//  A z=ga(w->t,r,d);mv(z->p,w->p+(n**a->p),n);R z;}
-// V1(box){A z=ga(1,0,0);*z->p=(I)w;R z;}
-// V2(cat){I an=tr(a->r,a->d),wn=tr(w->r,w->d),n=an+wn;
-//  A z=ga(w->t,1,&n);mv(z->p,a->p,an);mv(z->p+an,w->p,wn);R z;}
-// V2(find){}
-// V2(rsh){I r=a->r?*a->d:1,n=tr(r,a->p),wn=tr(w->r,w->d);
-//  A z=ga(w->t,r,a->p);mv(z->p,w->p,wn=n>wn?wn:n);
-//  if(n-=wn)mv(z->p+wn,z->p,n);R z;}
-// V1(sha){A z=ga(0,1,&w->r);mv(z->p,w->d,w->r);R z;}
-// V1(id){R w;}V1(size){A z=ga(0,0,0);*z->p=w->r?*w->d:1;R z;}
-// pi(i){P("%d ",i);}nl(){P("\n");}
-func prInt(i int) {
-	fmt.Print(i, " ")
+func miot(w A) (z A) {
+	//fmt.Println("iot")
+	//pr(w)
+	if w.Type == Loc {
+		fmt.Println("found location")
+		w = st[w.Data.(int)]
+		//fmt.Println("pulled from location", w.Data)
+		//pr(w)
+	}
+	if len(w.Shape) == 0 {
+		n := w.Data.(int)
+		d := make([]int, n)
+		for i := 0; i < n; i++ {
+			d[i] = i
+		}
+		z = mkA(Value, []int{n})
+		z.Data = d
+		//fmt.Println("miot returning", z)
+	} else {
+		fmt.Println("miot expects single values")
+	}
+	return z
+}
+func diot(a, w A) (na A) {
+	fmt.Println("diot not implemented")
+	return
+}
+func dasgn(a, w A) (na A) {
+	if a.Type != Loc {
+		fmt.Println("asgn expected location in a")
+		return
+	}
+	loc := a.Data.(int)
+	if loc < 0 || loc >= 26 {
+		fmt.Println("Location out of range")
+	} else {
+		st[loc] = w
+		return w
+	}
+	return
+}
+func dcat(a, w A) A {
+	fmt.Println("dcat not implemented")
+	return w
+}
+func dinsert(a, w A) (na A) {
+	//fmt.Println("dinsert a", a, "dinsert w", w)
+	if w.Length == 0 {
+		return w
+	}
+	if a.Type != Op {
+		fmt.Println("dinsert expected op")
+		return w
+	}
+	if vt[a.Data.(int)] != '+' {
+		fmt.Println("Unexpected op to dinsert", a.Data)
+		return w
+	}
+	//fmt.Println("dinsert found +")
+	if len(w.Shape) == 0 {
+		return w
+	}
+	na.Type = Value
+	na.Shape = []int{}
+	rv := 0
+	for _, v := range w.Data.([]int) {
+		rv += v
+	}
+	na.Data = rv
+	return
+}
+func dplus(a, w A) (na A) {
+	fmt.Println("dplus a", a, "dplus w", w)
+	if a.Type == Loc {
+		a = st[a.Data.(int)]
+	}
+	if len(a.Shape) == 0 && len(w.Shape) == 0 {
+		return mkIntA(Value, a.Data.(int)+w.Data.(int))
+	}
+	if len(a.Shape) == 0 {
+		av := a.Data.(int)
+		nd := make([]int, w.Length)
+		od := w.Data.([]int)
+		for i := 0; i < w.Length; i++ {
+			nd[i] = av + od[i]
+		}
+		na.Type = Value
+		na.Shape = w.Shape
+		na.Length = w.Length
+		na.Data = nd
+		return
+	}
+	fmt.Println("dplus not complete")
+	return
+}
+func mbox(a A) A {
+	fmt.Println("mbox not implemented")
+	return a
+}
+func mid(a A) A {
+	return a
+}
+func minsert(a A) A {
+	fmt.Println("minsert", a)
+	return a
+}
+func mrank(a A) A {
+	//fmt.Println("mrank", a)
+	na := mkA(Value, []int{})
+	na.Shape = make([]int, len(a.Shape))
+	na.Length = len(a.Shape)
+	na.Data = len(a.Shape)
+	return na
 }
 func newLine() {
 	fmt.Println()
 }
-
-// pr(w)A w;{I r=w->r,*d=w->d,n=tr(r,d);DO(r,pi(d[i]));nl();
-//  if(w->t)DO(n,P("< ");pr(w->p[i]))else DO(n,pi(w->p[i]));nl();}
-func pr(w Array) {
-	//fmt.Println("Just called 'pr'")
+func prInt(i int) {
+	fmt.Print(i, " ")
+}
+func pr(w A) {
+	//fmt.Println("Just called 'pr' on", w)
+	//fmt.Println("shape", w.Shape)
 	for _, d := range w.Shape {
 		prInt(d)
 	}
-	newLine()
-	switch w.Type {
-	case IntArray:
-		for i := 0; i < w.Length; i++ {
-			prInt(w.Data.([]int)[0])
-		}
+	if len(w.Shape) > 0 {
 		newLine()
-	case BoxArray:
+	}
+	switch w.Type {
+	case Loc:
+		fmt.Print(st[w.Data.(int)])
+	case Op:
+		fmt.Print(string(vt[w.Data.(int)]))
+	case Value:
+		//fmt.Println("printing", w)
+		if len(w.Shape) == 0 {
+			prInt(w.Data.(int))
+		} else {
+			for i := 0; i < w.Length; i++ {
+				prInt(w.Data.([]int)[i])
+			}
+		}
+	case Box:
 		fmt.Print("< ")
 		for i := 0; i < w.Length; i++ {
-			pr(w.Data.([]Array)[i])
+			pr(w.Data.([]A)[i])
 		}
 	}
 }
 
-// C vt[]="+{~<#,";
-var vt = "+{~<#,"
+var vt = "=+{~<#,/"
+var vDyads = []vDyad{dasgn, dplus, nil, diot, nil, nil, dcat, dinsert}
+var vMonads = []vMonad{nil, mid, nil, miot, mbox, mrank, nil, minsert}
+var st [26]A
 
-// A(*vd[])()={0,plus,from,find,0,rsh,cat},
-//  (*vm[])()={0,id,size,iota,box,sha,0};
-var vDyads = []vDyad{}
-var vMonads = []vMonad{nil, iot, iot}
-
-// I st[26]; qp(a){R  a>='a'&&a<='z';}qv(a){R a<'a';}
-var st [26]Array
-
-func isAlpha(a byte) bool { return a >= 'a' && a <= 'z' }
-func isOp(a byte) bool    { return a < 'a' }
-
-// A ex(e)I *e;{I a=*e;
-//  if(qp(a)){if(e[1]=='=')R st[a-'a']=ex(e+2);a= st[ a-'a'];}
-//  R qv(a)?(*vm[a])(ex(e+1)):e[1]?(*vd[e[1]])(a,ex(e+2)):(A)a;}
-func execute(e Array) (z Array) {
-	fmt.Println("executing", e)
+func ex(e A) (z A) {
+	//fmt.Println("ex", e)
 	switch e.Type {
-	case BoxArray:
-		fmt.Println("Found BoxArray")
-		a := e.Data.([]Array)[0]
-		b := e.Data.([]Array)[1]
-		fmt.Println("unboxed a&b:", a, b)
-		if b.Type == VNValue && b.Data.(int) == int('=') {
-			fmt.Println("found asgn")
-			z = getArray(BoxArray, []int{e.Length - 2})
-			z.Data = e.Data.([]Array)[2:]
-			res := execute(z)
-			st[a.Data.(int)-'a'] = res
-			return res
-		}
-		switch a.Type {
-		case IntArray:
-			fmt.Println("IntArray", a.Data)
-			return a
-		case VNValue:
-			fmt.Println("VerbArray", a.Data, string(vt[a.Data.([]int)[0]]))
-			return vMonads[a.Data.([]int)[0]](execute(e.Data.([]Array)[1]))
-		default:
-			fmt.Println("Unexpected array type", a.Type)
-		}
-	case IntArray:
-		fmt.Println("executing IntArray", e)
+	case Loc:
+		return st[e.Data.(int)]
+	case Op:
+		fmt.Println("Found Op unexpectedly")
+		return
+	case Value:
 		return e
-	case VNValue:
-		fmt.Println("return VNValue")
-		return e
+	case Box:
+		if e.Length == 0 {
+			fmt.Println("ex:Empty box")
+			return
+		} else if e.Length == 1 {
+			return ex(e.Data.([]A)[0])
+		} else {
+			a := e.Data.([]A)[0]
+			b := e.Data.([]A)[1]
+			if a.Type == Op && b.Type == Op { // adverb
+				rest := mkA(Box, []int{e.Length - 2})
+				rest.Data = e.Data.([]A)[2:]
+				if vt[b.Data.(int)] == '/' {
+					return dinsert(a, ex(rest))
+				}
+				fmt.Println("expected /")
+				return
+			}
+			if a.Type == Op { // monad
+				rest := mkA(Box, []int{e.Length - 1})
+				rest.Data = e.Data.([]A)[1:]
+				if b.Type == Op {
+					return vDyads[b.Data.(int)](a, rest)
+				}
+				return vMonads[a.Data.(int)](ex(rest))
+			}
+			if b.Type == Op {
+				rest := mkA(Box, []int{e.Length - 2})
+				rest.Data = e.Data.([]A)[2:]
+				return vDyads[b.Data.(int)](a, ex(rest))
+			}
+		}
+		fmt.Println("Don't know what to execute")
+		return
 	default:
-		fmt.Println("execute of unknown type", e.Type)
+		fmt.Println("Unexpected Type", e.Type)
 	}
 	return
 }
-
-// noun(c){A z;if(c<'0'||c>'9')R 0;z=ga(0,0,0);*z->p=c-'0';R z;}
-func mkNoun(c byte) (z Array, ok bool) {
-	if c < '0' || c > '9' {
-		return z, false
-	}
-	return getVNValue(int(c-'0')), true
-	// z = getArray(0, []int{1})
-	// z.Data = make([]int, 1)
-	// z.Data.([]int)[0] = int(c - '0')
-	// return z, true
-}
-
-// verb(c){I i=0;for(;vt[i];)if(vt[i++]==c)R i;R 0;}
 func verbPos(ct byte) (pos int, ok bool) {
 	pos = strings.IndexByte(vt, ct)
 	if pos < 0 {
@@ -214,40 +268,39 @@ func verbPos(ct byte) (pos int, ok bool) {
 	}
 	return pos, true
 }
-
-// I *wd(s)C *s;{I a,n=strlen(s),*e=ma(n+1);C c;
-//  DO(n,e[i]=(a=noun(c=s[i]))?a:(a=verb(c))?a:c);e[n]=0;R e;}
-func words(s string) (z Array) {
-	fmt.Println("just called words")
+func mkNoun(c byte) (z A, ok bool) {
+	if c < '0' || c > '9' {
+		return z, false
+	}
+	return mkIntA(Value, int(c-'0')), true
+}
+func words(s string) (z A) {
+	//fmt.Println("just called words")
 	n := len(s)
-	e := make([]Array, n+1) // extra needed for look ahead
+	e := make([]A, n)
 	for i := 0; i < n; i++ {
 		c := s[i]
-		fmt.Println("looking at", c, string(c))
+		//fmt.Println("looking at", c, string(c))
 		if a, ok := mkNoun(c); ok {
 			e[i] = a
-			fmt.Println("wordsA", e[i])
+			//fmt.Println("wordsA", e[i])
 		} else if a, ok := verbPos(c); ok {
-			e[i] = getIntArray(VNValue, a)
-			fmt.Println("wordsB", e[i])
-		} else if isAlpha(c){
-			e[i] = getLocation(c-'a')
-		}
+			e[i] = mkIntA(Op, a)
+			//fmt.Println("wordsB", e[i])
+		} else if c >= 'a' && c <= 'z' {
+			e[i] = mkIntA(Loc, int(c-'a'))
 		} else {
-			e[i] = getIntArray(IntArray, int(c))
-			fmt.Println("wordsC", e[i])
+			e[i] = mkIntA(Value, int(c))
+			//fmt.Println("wordsC", e[i])
 		}
 	}
-	//e[n] = getIntArray(ZeroArray, 0)
-	z.Type = BoxArray
+	z.Type = Box
+	z.Shape = []int{n}
 	z.Length = n
 	z.Data = e
-	fmt.Println("wordsDone", z)
+	//fmt.Println("wordsDone", z)
 	return
 }
-
-// main(){C s[99];while(gets(s))pr(ex(wd(s)));}
-
 func getString(reader *bufio.Reader) string {
 	fmt.Print("> ")
 	text, _ := reader.ReadString('\n')
@@ -258,24 +311,29 @@ func main() {
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		//w := words(getString(reader))
-		w := words("~3")
-		fmt.Println("words:", w)
-		pr(w)
-		res := execute(w)
-		fmt.Println("Result:", res)
-		pr(res)
-		w = words("a=1")
-		fmt.Println("words:", w)
-		res = execute(w)
-		fmt.Println("Result:", res)
-		pr(res)
-		fmt.Println("a")
-		w = words("a")
-		res = execute(w)
-		fmt.Println("Result:", res)
-		pr(res)
-		break
+		// w := words("~4")
+		// fmt.Println("words:", w)
+		// pr(w)
+		// res := ex(w)
+		// //fmt.Println("Result:", res)
+		// pr(res)
+		// newLine()
+		// w = words("d=8")
+		// fmt.Println("words:", w)
+		// res = ex(w)
+		// fmt.Println("Result:", res, st)
+		// pr(res)
+		// w = words("d")
+		// res = ex(w)
+		// fmt.Println("Result of d:", res)
+		// pr(res)
+		// break
+		s := getString(reader)
+		if s == "quit" || s == "exit" {
+			break
+		}
 		//if w=="quit" || w=="exit"{break}
-		pr(execute(words(getString(reader))))
+		pr(ex(words(s)))
+		newLine()
 	}
 }
