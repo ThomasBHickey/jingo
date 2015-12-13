@@ -1,6 +1,6 @@
 // My attempt at a simple interpreter
 // modeled on Arthur Whitney's 1 page interpreter that
-// inspired the J implementation (see incunabulum at jsoftware.com)
+// inspired the J implementation (see http://www.jsoftware.com/jwiki/Essays/Incunabulum)
 // Copyright Thomas B. Hickey 2015
 // See license.txt in github.com/ThomasBHickey/jingo
 
