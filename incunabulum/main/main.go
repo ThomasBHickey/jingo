@@ -128,7 +128,7 @@ func dinsert(a, w A) (na A) {
 	return
 }
 func dplus(a, w A) (na A) {
-	fmt.Println("dplus a", a, "dplus w", w)
+	//fmt.Println("dplus a", a, "dplus w", w)
 	if a.Type == Loc {
 		a = st[a.Data.(int)]
 	}
@@ -195,13 +195,17 @@ func pr(w A) {
 		if len(w.Shape) == 0 {
 			prInt(w.Data.(int))
 		} else {
-			for i := 0; i < w.Length; i++ {
+			topr := w.Length
+			if topr>20{topr=20}
+			for i := 0; i < topr; i++ {
 				prInt(w.Data.([]int)[i])
 			}
 		}
 	case Box:
 		fmt.Print("< ")
-		for i := 0; i < w.Length; i++ {
+		topr := w.Length
+		if topr>20{topr =20}
+		for i := 0; i < topr; i++ {
 			pr(w.Data.([]A)[i])
 		}
 	}
