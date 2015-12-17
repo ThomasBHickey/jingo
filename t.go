@@ -28,8 +28,8 @@ func init() {
 
 var id2pdef = map[IDType]pdef{}
 
-type dyadFunct func(x, y Array) (rv Array, err error)
-type monadFunct func(x Array) (rv Array, err error)
+type dyadFunct func(x, y A) (rv A, err error)
+type monadFunct func(x A) (rv A, err error)
 type pdef struct {
 	atype AType
 	Monad monadFunct
@@ -41,7 +41,7 @@ type pdef struct {
 	spelling IDType
 }
 
-func add2(x, w Array) (Array, error) {
+func add2(x, w A) (A, error) {
 	ra := NewIntArray(x.Shape)
 	if x.Type == INT && w.Type == INT && x.Length == 1 && w.Length == 1 {
 		ra.Data = make([]int64, x.Length)
@@ -51,9 +51,9 @@ func add2(x, w Array) (Array, error) {
 	return ra, errors.New("Unexpected arrays in add2")
 }
 
-func asgn(a Array, w Array) (Array, error) {
+func asgn(a A, w A) (A, error) {
 	fmt.Println("In func asgn!")
-	return Array{}, nil
+	return A{}, nil
 }
 
 type value struct{ z int }

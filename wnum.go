@@ -6,7 +6,8 @@ package jingo
 import (
 	"fmt"
 )
-func connum(s string) (Array, bool){
+
+func connum(s string) (A, bool) {
 	fmt.Println("In connum with", s)
-	return Array{}, false
+	return A{}, false
 }

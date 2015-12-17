@@ -150,7 +150,7 @@ func Scan(text string) []wp {
 	// 		pdef, ok := id2pdef[id]
 	// 		snpdefs = append(snpdefs, snpdef{s: s, id: id, pd: pdef})
 	// 		if ok {
-	// 			dyres, _ := pdef.Dyad(Array{}, Array{})
+	// 			dyres, _ := pdef.Dyad(A{}, A{})
 	// 			fmt.Println("pdef dyres", dyres)
 	// 		}
 	// 	}
@@ -161,9 +161,9 @@ func Scan(text string) []wp {
 	return wps
 }
 
-func Enqueue(wps []wp, text string) ([]Array, EventType) {
+func Enqueue(wps []wp, text string) ([]A, EventType) {
 	fmt.Println("In word.Enqueue")
-	queue := []Array{}
+	queue := []A{}
 	var y pdef
 	var b bool
 	for _, wp := range wps {
@@ -193,14 +193,14 @@ func Enqueue(wps []wp, text string) ([]Array, EventType) {
 		} else {
 			switch p {
 			case C9:
-				x := connum(s)
-				if x.atype==NoAType {
-					return (queue, 0)
+				x, ok := connum(s)
+				if !ok {
+					return queue, 0
 				}
 				queue = append(queue, x)
 			case CQ:
 				x, err := constr(s)
-				if err {
+				if err!=0 {
 					return queue, err
 				}
 				queue = append(queue, x)

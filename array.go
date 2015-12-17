@@ -9,7 +9,7 @@ import (
 )
 
 type Vector interface{}
-type Array struct {
+type A struct {
 	Type     AType
 	RefCount int
 	Length   int
@@ -17,7 +17,7 @@ type Array struct {
 	Data     Vector
 }
 
-func newArray(shape []int) (a Array) {
+func newArray(shape []int) (a A) {
 	a.RefCount = 1
 	a.Length = 1
 	for _, sp := range shape {
@@ -27,20 +27,20 @@ func newArray(shape []int) (a Array) {
 	return
 }
 
-func NewIntArray(shape []int) (a Array) {
+func NewIntArray(shape []int) (a A) {
 	a = newArray(shape)
 	a.Type = INT
 	a.Data = make([]int64, a.Length)
 	return
 }
 
-func NewByteArray(shape []int) (a Array) {
+func NewByteArray(shape []int) (a A) {
 	a = newArray(shape)
 	a.Type = LIT
 	a.Data = make([]byte, a.Length)
 	return
 }
-func (array Array) ShowArray() {
+func (array A) ShowArray() {
 	switch array.Type {
 	case INT:
 		fmt.Println("Found INT array")
