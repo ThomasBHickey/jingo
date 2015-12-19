@@ -26,21 +26,32 @@ func init() {
 	wtype['B'] = CB
 }
 
-var id2pdef = map[IDType]pdef{}
+var id2pdef = map[IDType]A{}
+
+func cid2pdef(idt IDType) A {
+	if idt < 128 {
+		return id2pdef[idt]
+	}
+	return NewVerbArray(VAData{})
+}
 
 type dyadFunct func(x, y A) (rv A, err error)
 type monadFunct func(x A) (rv A, err error)
-type pdef struct {
-	atype AType
-	Monad monadFunct
-	Dyad  dyadFunct
-	monadicRank,
-	leftRank,
-	rightRank,
+type VAData struct {
+	f1 monadFunct
+	f2 dyadFunct
+	f, // left conj or adverb argument
+	g, // right conj. argument
+	h A // auxiliary argument
+	flag bool //not sure what gets flagged
+	mr,  // monadic rank
+	lr, // left dyadic rank
+	rr, // right dyadic rank
 	funcDepth int
-	spelling IDType
+	id IDType
 }
 
+//	id2pdef[CASGN] = pdef{atype: ASGN, Dyad: asgn} // =.
 func add2(x, w A) (A, error) {
 	ra := NewIntArray(x.Shape)
 	if x.Type == INT && w.Type == INT && x.Length == 1 && w.Length == 1 {
@@ -64,6 +75,8 @@ func init() {
 	// f2 = add2
 	// res, _ := f2(1, 2)
 	// fmt.Println("f2: ", res)
-	id2pdef[CASGN] = pdef{atype: ASGN, Dyad: asgn} // =.
-	id2pdef[CPLUS] = pdef{atype: VERB, Dyad: add2} // +
+	id2pdef[CASGN] = NewVerbArray(VAData{f2: asgn, id: CASGN})
+	//id2pdef[CASGN] = pdef{atype: ASGN, Dyad: asgn} // =.
+	//id2pdef[CPLUS] = pdef{atype: VERB, Dyad: add2} // +
+	id2pdef[CPLUS] = NewVerbArray(VAData{})
 }

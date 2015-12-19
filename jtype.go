@@ -8,6 +8,16 @@ func init() {
 	fmt.Println("SPARSE", SPARSE, "LIT", LIT, "SINT", SINT)
 }
 
+/* Values for AFLAG(x) field of type A                                     */
+type AFLAG int
+
+const (
+	AFRO  = 1 << iota //1            /* read only; can't change data    */
+	AFNJA             //2            /* non-J alloc; i.e. mem mapped    */
+	AFSMM             //4            /* SMM managed                     */
+//AFREL         //8            /* uses relative addressing        */
+)
+
 //go:generate stringer -type=AType
 type AType int
 

@@ -8,37 +8,56 @@ import (
 	"fmt"
 )
 
-type Vector interface{}
+type AData interface{}
+
+// J source has additional fields:
+// k: offset of ravel
+// RefCount : reference count
+// flag: indication of memory usage (e.g. AFRO, AFRMM, etc.)
+//       maybe the read only & memory mapped would be useful?
+// m: # bytes in ravel
+
 type A struct {
-	Type     AType
-	RefCount int
-	Length   int
-	Shape    []int
-	Data     Vector
+	Type   AType // defined in jtype
+	Flag   AFLAG // defined in jtype
+	Length int
+	Shape  []int
+	Data   AData
 }
 
-func newArray(shape []int) (a A) {
-	a.RefCount = 1
-	a.Length = 1
+func shape2length(shape []int) (length int) {
+	length = 1
 	for _, sp := range shape {
-		a.Length *= sp
+		length *= sp
 	}
+	return
+}
+func NewArray(typ AType, shape []int, adata AData) (a A) {
+	a.Type = typ
+	a.Length = shape2length(shape)
 	a.Shape = shape
+	a.Data = adata
 	return
 }
 
-func NewIntArray(shape []int) (a A) {
-	a = newArray(shape)
-	a.Type = INT
-	a.Data = make([]int64, a.Length)
-	return
+func NewVerbArray(vd VAData) A {
+	a := NewArray(VERB, []int{}, vd)
+	return a
+}
+
+func NewIntArray(shape []int) A {
+	a := NewArray(INT, shape, make([]int64, shape2length(shape)))
+	return a
+}
+func NewSIntArray(i int) A{
+	a := NewIntArray([]int{})
+	a.Data = []int{i}
+	return a
 }
 
 func NewByteArray(shape []int) (a A) {
-	a = newArray(shape)
-	a.Type = LIT
-	a.Data = make([]byte, a.Length)
-	return
+	a = NewArray(LIT, shape, make([]byte, shape2length(shape)))
+	return a
 }
 func (array A) ShowArray() {
 	switch array.Type {

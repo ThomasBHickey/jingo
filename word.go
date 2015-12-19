@@ -161,10 +161,17 @@ func Scan(text string) []wp {
 	return wps
 }
 
+func runeIfNotb(p rune, b bool) rune {
+	if b {
+		return 0
+	}
+	return p
+}
+
 func Enqueue(wps []wp, text string) ([]A, EventType) {
 	fmt.Println("In word.Enqueue")
 	queue := []A{}
-	var y pdef
+	var y A
 	var b bool
 	for _, wp := range wps {
 		s := text[wp.Start:wp.End] // string in utf-8
@@ -176,18 +183,21 @@ func Enqueue(wps []wp, text string) ([]A, EventType) {
 		p := runeToCType(c)
 		fmt.Println("p: ctype[firstchar]", p)
 		if wl > 1 {
-			d := runes[len(runes)-1]
+			d := ESCType(runes[len(runes)-1])
 			fmt.Println("d last char", d)
-			if b = p != C9 && (ESCType(d) == CESC1 || ESCType(d) == CESC2); b {
+			if b = p != C9 && d == CESC1 || d == CESC2; b {
 				e = spellIn[s]
 				fmt.Println("b is true, e:", e)
 			}
 		}
-		if c < 128 {
+		if y = cid2pdef(e); y.Type != NoAType {
 			y = id2pdef[e]
+			fmt.Println("c<128, y=", y)
 		}
-		if y.atype != NoAType {
-			fmt.Println("Found pdef1", y)
+		y, ok := id2pdef[e]
+		if ok{
+			fmt.Println("c<128, e=", e, "ok", ok, "y=id2pdef[e]", y)
+			queue = append(queue, y)
 		} else if b {
 			fmt.Println("UNEXPECTED b?")
 		} else {
@@ -200,7 +210,7 @@ func Enqueue(wps []wp, text string) ([]A, EventType) {
 				queue = append(queue, x)
 			case CQ:
 				x, err := constr(s)
-				if err!=0 {
+				if err != 0 {
 					return queue, err
 				}
 				queue = append(queue, x)

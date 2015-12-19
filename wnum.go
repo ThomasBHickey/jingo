@@ -5,9 +5,14 @@ package jingo
 
 import (
 	"fmt"
+	"strconv"
 )
 
 func connum(s string) (A, bool) {
-	fmt.Println("In connum with", s)
-	return A{}, false
+	i, err := strconv.Atoi(s)
+	fmt.Println("In connum with", s, i, err)
+	if err != nil{
+		return A{}, false
+	}
+	return NewSIntArray(i), true
 }
