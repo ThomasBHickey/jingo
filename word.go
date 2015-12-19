@@ -195,7 +195,7 @@ func Enqueue(wps []wp, text string) ([]A, EventType) {
 			fmt.Println("c<128, y=", y)
 		}
 		y, ok := id2pdef[e]
-		if ok{
+		if ok {
 			fmt.Println("c<128, e=", e, "ok", ok, "y=id2pdef[e]", y)
 			queue = append(queue, y)
 		} else if b {

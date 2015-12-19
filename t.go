@@ -71,12 +71,6 @@ type value struct{ z int }
 
 func init() {
 	fmt.Println("Hi from t.go!")
-	// var f2 dyad
-	// f2 = add2
-	// res, _ := f2(1, 2)
-	// fmt.Println("f2: ", res)
 	id2pdef[CASGN] = NewVerbArray(VAData{f2: asgn, id: CASGN})
-	//id2pdef[CASGN] = pdef{atype: ASGN, Dyad: asgn} // =.
-	//id2pdef[CPLUS] = pdef{atype: VERB, Dyad: add2} // +
-	id2pdef[CPLUS] = NewVerbArray(VAData{})
+	id2pdef[CPLUS] = NewVerbArray(VAData{f2: add2})
 }

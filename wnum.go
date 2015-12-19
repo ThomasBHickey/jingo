@@ -11,7 +11,7 @@ import (
 func connum(s string) (A, bool) {
 	i, err := strconv.Atoi(s)
 	fmt.Println("In connum with", s, i, err)
-	if err != nil{
+	if err != nil {
 		return A{}, false
 	}
 	return NewSIntArray(i), true

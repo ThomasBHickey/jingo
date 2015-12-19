@@ -49,7 +49,7 @@ func NewIntArray(shape []int) A {
 	a := NewArray(INT, shape, make([]int64, shape2length(shape)))
 	return a
 }
-func NewSIntArray(i int) A{
+func NewSIntArray(i int) A {
 	a := NewIntArray([]int{})
 	a.Data = []int{i}
 	return a
