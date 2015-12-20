@@ -71,12 +71,23 @@ PT cases[] = {
  LPAR,      CAVN,      RPAR, ANY,       jtpunc,    jtvpunc,  0,2,0,
 };*/
 
-func Parse(jt J, q []A) (z A) {
+func Parse(jt J, q []A) (z A, err error) {
 	fmt.Println("in Parse")
 	// problem:  deba expects an array, but we've got a slice of A's
-	if _, err := deba(jt, DCPARSE, A{}, A{}, A{}); err != nil {
+	if _, err = deba(jt, DCPARSE, A{}, A{}, A{}); err != nil {
 		return
 	}
+	z, err = Parsea(jt, q)
+	if err!=nil{
+		fmt.Println("Error on Parsea", err)
+		return
+	}
+
 	debz()
+	return
+}
+
+func Parsea(jt J, q[]A)(z A, err error){
+	fmt.Println("in Parsea")
 	return
 }

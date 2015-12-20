@@ -24,7 +24,7 @@ func main() {
 		fmt.Println("enqueue failed", event)
 	} else {
 		fmt.Println("enqueue", q)
-		z := jingo.Parse(jt, q)
-		fmt.Println("result of Parse", z)
+		z, err := jingo.Parse(jt, q)
+		fmt.Println("result of Parse", err, z)
 	}
 }
