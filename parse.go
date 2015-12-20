@@ -1,6 +1,12 @@
+// Copyright 2015 Thomas B. Hickey
+// Use of this code is goverened by
+// license that can be found in the LICENSE file
+
 package jingo
 
-import ()
+import (
+	"fmt"
+)
 
 type Action int
 
@@ -33,9 +39,9 @@ const (
 )
 
 type ptCase struct {
-	pattern        [4]AType
-	funcType       [2]Action
-	start, stop, q int // don't know what q is yet
+	pattern       [4]AType
+	funcType      [2]Action
+	begin, end, k int // don't know what k is yet
 }
 
 var ptCases [9]ptCase
@@ -64,3 +70,13 @@ PT cases[] = {
  NAME+NOUN, ASGN,      CAVN, ANY,       jtis,      jtvis,    0,2,1,
  LPAR,      CAVN,      RPAR, ANY,       jtpunc,    jtvpunc,  0,2,0,
 };*/
+
+func Parse(jt J, q []A) (z A) {
+	fmt.Println("in Parse")
+	// problem:  deba expects an array, but we've got a slice of A's
+	if _, err := deba(jt, DCPARSE, A{}, A{}, A{}); err != nil {
+		return
+	}
+	debz()
+	return
+}

@@ -3,22 +3,28 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/ThomasBHickey/jingo"
 	"os"
 	"strings"
-	"github.com/ThomasBHickey/jingo"
 )
 
-
 func main() {
-	//fmt.Println("In Main")
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print("> ")
 	text, _ := reader.ReadString('\n')
 	ttext := strings.TrimSpace(text)
-	wps :=jingo.Scan(ttext)
+	jt := jingo.J{}
+	wps := jingo.Scan(jt, ttext)
 	fmt.Println("wps")
-	for _, w := range(wps){
+	for _, w := range wps {
 		fmt.Println(text[w.Start:w.End])
-		}
-	jingo.Enqueue(wps, ttext)
+	}
+	q, event := jingo.Enqueue(jt, wps, ttext)
+	if event!=0 {
+		fmt.Println("enqueue failed", event)
+	} else {
+		fmt.Println("enqueue", q)
+		z := jingo.Parse(jt, q)
+		fmt.Println("result of Parse", z)
+	}
 }

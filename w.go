@@ -1,5 +1,6 @@
-// Copyright Thomas B. Hickey 2015
-// See license.txt in github.com/ThomasBHickey/jingo
+// Copyright 2015 Thomas B. Hickey
+// Use of this code is goverened by
+// license that can be found in the LICENSE file
 package jingo
 
 import (

@@ -1,3 +1,7 @@
+// Copyright 2015 Thomas B. Hickey
+// Use of this code is goverened by
+// license that can be found in the LICENSE file
+
 package jingo
 
 import (
@@ -73,3 +77,21 @@ const (
 // 	fmt.Printf("ANY: %x\n", ANY)
 // 	fmt.Printf("ANY & XZ %x\n", ANY & XZ)
 // }
+
+type DST struct { /* 1 2 3                                                        */
+	//struct DS*dclnk;       /* x x x  link to next stack entry                              */
+	dca    A    /*     x  fn/op name                                            */
+	dcf    A    /*     x  fn/op                                                 */
+	dcx    A    /*     x  left argument                                         */
+	dcy    A    /* x x x  tokens text        ; right argument                  */
+	dcloc  A    /*     x  local symb table (0 if not explicit)                  */
+	dcc    A    /*     x  control matrix   (0 if not explicit)                  */
+	dci    int  /* x x x  index  next index  ; ptr to line #                   */
+	dcj    int  /*   x x        ; prev index  ; error #                         */
+	dcn    int  /*   x x        ; line #      ; ptr to symb entry               */
+	dcm    int  /*   x x        ; script index; # of non-locale part of name    */
+	dcstop int  /*     x  the last stop in this function                        */
+	dctype byte /* x x x  type of entry (see #define DC*)                       */
+	dcsusp bool /* x   x  1 iff begins a debug suspension                       */
+	dcss   byte /*     x  single step code                                      */
+}

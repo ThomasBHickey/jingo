@@ -65,15 +65,9 @@ func runeToWType(r rune) CBType {
 	}
 }
 
-// type snpdef struct { // s and pdef
-// 	s  string
-// 	id IDType
-// 	pd pdef
-// }
-
 type wp struct{ Start, End int } // word position
 
-func Scan(text string) []wp {
+func Scan(jt J, text string) []wp {
 	fmt.Println("In Scan", text)
 	nv := false    // numeric value being built
 	cs := SS       // current state
@@ -168,7 +162,7 @@ func runeIfNotb(p rune, b bool) rune {
 	return p
 }
 
-func Enqueue(wps []wp, text string) ([]A, EventType) {
+func Enqueue(jt J, wps []wp, text string) ([]A, EventType) {
 	fmt.Println("In word.Enqueue")
 	queue := []A{}
 	var y A
@@ -220,6 +214,5 @@ func Enqueue(wps []wp, text string) ([]A, EventType) {
 			}
 		}
 	}
-	fmt.Println("queue", queue)
 	return queue, 0
 }
