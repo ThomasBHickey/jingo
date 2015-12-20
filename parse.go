@@ -77,17 +77,17 @@ func Parse(jt J, q []A) (z A, err error) {
 	if _, err = deba(jt, DCPARSE, A{}, A{}, A{}); err != nil {
 		return
 	}
+	q = append(q, []A{mark,mark,mark,mark}...)
 	z, err = Parsea(jt, q)
-	if err!=nil{
+	debz()
+	if err != nil {
 		fmt.Println("Error on Parsea", err)
 		return
 	}
-
-	debz()
 	return
 }
 
-func Parsea(jt J, q[]A)(z A, err error){
-	fmt.Println("in Parsea")
+func Parsea(jt J, q []A) (z A, err error) {
+	fmt.Println("in Parsea", q)
 	return
 }
