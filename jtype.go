@@ -60,16 +60,16 @@ const (
 	XZ                        // (i)536870912L   /* ZX extended complex             */
 
 	ANY     AType = 0xffffffff
-	SPARSE        = (SB01 | SINT | SFL | SCMPX | SLIT | SBOX)
-	DENSE         = (NOUN &^ SPARSE)
-	NUMERIC       = (B01 | BIT | INT | FL | CMPX | XNUM | RAT | XD | XZ | SB01 | SINT | SFL | SCMPX)
-	DIRECT        = (LIT | C2T | B01 | BIT | INT | FL | CMPX | SBT)
-	JCHAR         = (LIT | C2T | SLIT)
-	NOUN          = (NUMERIC | JCHAR | BOX | SBOX | SBT)
-	FUNC          = (VERB | ADV | CONJ)
-	RHS           = (NOUN | FUNC)
-	IS1BYTE       = (B01 | LIT)
-	LAST0         = (B01 | LIT | C2T | NAME)
+	SPARSE  AType = (SB01 | SINT | SFL | SCMPX | SLIT | SBOX)
+	DENSE   AType = (NOUN &^ SPARSE)
+	NUMERIC AType = (B01 | BIT | INT | FL | CMPX | XNUM | RAT | XD | XZ | SB01 | SINT | SFL | SCMPX)
+	DIRECT  AType = (LIT | C2T | B01 | BIT | INT | FL | CMPX | SBT)
+	JCHAR   AType = (LIT | C2T | SLIT)
+	NOUN    AType = (NUMERIC | JCHAR | BOX | SBOX | SBT)
+	FUNC    AType = (VERB | ADV | CONJ)
+	RHS     AType = (NOUN | FUNC)
+	IS1BYTE AType = (B01 | LIT)
+	LAST0   AType = (B01 | LIT | C2T | NAME)
 )
 
 // func init() {

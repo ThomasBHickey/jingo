@@ -92,6 +92,12 @@ func init() {
 	Event2String[EVVALUE] = "value error"
 }
 
+var mark A
+
+func init() {
+	mark = NewArray(MARK, []int{}, nil)
+}
+
 func jsignal2(event EventType, pos wp) {
 	fmt.Println("jsignal2", Event2String[event], pos)
 }

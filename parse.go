@@ -77,7 +77,7 @@ func Parse(jt J, q []A) (z A, err error) {
 	if _, err = deba(jt, DCPARSE, A{}, A{}, A{}); err != nil {
 		return
 	}
-	q = append(q, []A{mark,mark,mark,mark}...)
+	q = append([]A{mark}, append(q, []A{mark, mark, mark, mark}...)...)
 	z, err = Parsea(jt, q)
 	debz()
 	if err != nil {
@@ -89,5 +89,45 @@ func Parse(jt J, q []A) (z A, err error) {
 
 func Parsea(jt J, q []A) (z A, err error) {
 	fmt.Println("in Parsea", q)
+	//(NUMERIC | JCHAR | BOX | SBOX | SBT)
+	//fmt.Println("NUMERIC, JCHAR, BOX, SBOX, SBT", NUMERIC, JCHAR, BOX, SBOX, SBT)
+
+	var i int
+	var ptc ptCase
+	stack := []A{}
+	for i = 0; i < 4; i++ {
+		stack = append(stack, q[len(q)-1])
+		q = q[0 : len(q)-1]
+	}
+	for {
+		stack = append(stack, q[len(q)-1])
+		q = q[0 : len(q)-1]
+		stp := len(stack) - 1 // stack top pos
+		fmt.Println("top 4 stack", stack[stp-0].Type, stack[stp-1].Type, stack[stp-2].Type, stack[stp-3].Type)
+		for i, ptc = range ptCases {
+			fmt.Println("Checking pattern", i)
+			pat := ptc.pattern
+			if ((pat[0] & stack[stp-0].Type) != 0) &&
+				((pat[1] & stack[stp-1].Type) != 0) &&
+				((pat[2] & stack[stp-2].Type) != 0) &&
+				((pat[3] & stack[stp-3].Type) != 0) {
+				fmt.Println("found match", i)
+				break
+			}
+		}
+		if len(q) < 1 {
+			break
+		}
+	}
+	fmt.Println("pat pos", i)
+	stp := len(stack) - 1
+	fmt.Println("stack 4 at end", stack[stp-0].Type, stack[stp-1].Type, stack[stp-2].Type, stack[stp-3].Type)
+	fmt.Println("q", q)
+	if i < len(ptCases) {
+		fmt.Println("Executing pattern", i)
+	}
+	//for i, ptc = range(ptCases){
+	// 	fmt.Println("i, pattern", i, ptc.pattern)
+	//}
 	return
 }
