@@ -5,32 +5,52 @@
 package jingo
 
 import (
+	"errors"
 	"fmt"
 )
 
-type Action int
+//type Action int
 
-const (
-	adv Action = iota
-	bident
-	cmonad
-	conj
-	dyad
-	fork
-	hook
-	is
-	monad
-	punc
-	trident
-	vadv
-	vconj
-	vdyad
-	vfork
-	vhook
-	vis
-	vmonad
-	vpunc
-)
+type Action func(jt J, b, e int, stack []A) (rv A, err error)
+
+// const (
+// 	dyad Action = dyadFunct
+// )
+
+// const (
+// 	adv Action = iota
+// 	bident
+// 	cmonad
+// 	conj
+// 	dyad
+// 	fork
+// 	hook
+// 	is
+// 	monad
+// 	punc
+// 	trident
+// 	vadv
+// 	vconj
+// 	vdyad
+// 	vfork
+// 	vhook
+// 	vis
+// 	vmonad
+// 	vpunc
+// )
+func dyad(jt J, b, e int, stack []A) (z A, err error) {
+	fmt.Println("In dyad", b, e, stack)
+	if (b-e)!=2 {
+		return z, errors.New("Expected 3 pieces in dyad")
+	}
+	fmt.Println("dyad 1st param", stack[e+2])
+	fmt.Println("dyad 2nd param", stack[e])
+	return stack[e+1].Data.(VAData).f2(jt, stack[e+2], stack[e])
+}
+func vdyad(jt J, b, e int, stack []A) (z A, err error) {
+	fmt.Println("In vdyad", b, e, stack)
+	return z, errors.New("vdyad undefined")
+}
 
 const (
 	AVN  AType = ADV | VERB | NOUN
@@ -47,15 +67,16 @@ type ptCase struct {
 var ptCases [9]ptCase
 
 func init() {
-	ptCases[0] = ptCase{[4]AType{EDGE, VERB, NOUN, ANY}, [2]Action{monad, vmonad}, 1, 2, 1}
-	ptCases[1] = ptCase{[4]AType{EDGE + AVN, VERB, VERB, NOUN}, [2]Action{monad, vmonad}, 2, 3, 2}
-	ptCases[2] = ptCase{[4]AType{EDGE + AVN, NOUN, VERB, NOUN}, [2]Action{dyad, vdyad}, 1, 3, 2}
-	ptCases[3] = ptCase{[4]AType{EDGE + AVN, VERB + NOUN, ADV, ANY}, [2]Action{adv, vadv}, 1, 2, 1}
-	ptCases[4] = ptCase{[4]AType{EDGE + AVN, VERB + NOUN, CONJ, VERB + NOUN}, [2]Action{conj, vconj}, 1, 3, 1}
-	ptCases[5] = ptCase{[4]AType{EDGE + AVN, VERB + NOUN, VERB, VERB}, [2]Action{trident, vfork}, 1, 3, 1}
-	ptCases[6] = ptCase{[4]AType{EDGE, CAVN, CAVN, ANY}, [2]Action{bident, vhook}, 1, 2, 1}
-	ptCases[7] = ptCase{[4]AType{NAME + NOUN, ASGN, CAVN, ANY}, [2]Action{is, vis}, 0, 2, 1}
-	ptCases[8] = ptCase{[4]AType{LPAR, CAVN, RPAR, ANY}, [2]Action{punc, vpunc}, 0, 2, 0}
+	ptCases[0] = ptCase{[4]AType{EDGE + AVN, NOUN, VERB, NOUN}, [2]Action{dyad, vdyad}, 1, 3, 2}
+	// ptCases[0] = ptCase{[4]AType{EDGE, VERB, NOUN, ANY}, [2]Action{monad, vmonad}, 1, 2, 1}
+	// ptCases[1] = ptCase{[4]AType{EDGE + AVN, VERB, VERB, NOUN}, [2]Action{monad, vmonad}, 2, 3, 2}
+	// ptCases[2] = ptCase{[4]AType{EDGE + AVN, NOUN, VERB, NOUN}, [2]Action{dyad, vdyad}, 1, 3, 2}
+	// ptCases[3] = ptCase{[4]AType{EDGE + AVN, VERB + NOUN, ADV, ANY}, [2]Action{adv, vadv}, 1, 2, 1}
+	// ptCases[4] = ptCase{[4]AType{EDGE + AVN, VERB + NOUN, CONJ, VERB + NOUN}, [2]Action{conj, vconj}, 1, 3, 1}
+	// ptCases[5] = ptCase{[4]AType{EDGE + AVN, VERB + NOUN, VERB, VERB}, [2]Action{trident, vfork}, 1, 3, 1}
+	// ptCases[6] = ptCase{[4]AType{EDGE, CAVN, CAVN, ANY}, [2]Action{bident, vhook}, 1, 2, 1}
+	// ptCases[7] = ptCase{[4]AType{NAME + NOUN, ASGN, CAVN, ANY}, [2]Action{is, vis}, 0, 2, 1}
+	// ptCases[8] = ptCase{[4]AType{LPAR, CAVN, RPAR, ANY}, [2]Action{punc, vpunc}, 0, 2, 0}
 }
 
 /*  The original from jsoftware.com
@@ -93,7 +114,7 @@ func Parsea(jt J, q []A) (z A, err error) {
 	//fmt.Println("NUMERIC, JCHAR, BOX, SBOX, SBT", NUMERIC, JCHAR, BOX, SBOX, SBT)
 
 	var i int
-	var ptc ptCase
+	//var ptc ptCase
 	stack := []A{}
 	for i = 0; i < 4; i++ {
 		stack = append(stack, q[len(q)-1])
@@ -104,9 +125,9 @@ func Parsea(jt J, q []A) (z A, err error) {
 		q = q[0 : len(q)-1]
 		stp := len(stack) - 1 // stack top pos
 		fmt.Println("top 4 stack", stack[stp-0].Type, stack[stp-1].Type, stack[stp-2].Type, stack[stp-3].Type)
-		for i, ptc = range ptCases {
+		for i = 0; i < len(ptCases); i++ {
 			fmt.Println("Checking pattern", i)
-			pat := ptc.pattern
+			pat := ptCases[i].pattern
 			if ((pat[0] & stack[stp-0].Type) != 0) &&
 				((pat[1] & stack[stp-1].Type) != 0) &&
 				((pat[2] & stack[stp-2].Type) != 0) &&
@@ -125,6 +146,16 @@ func Parsea(jt J, q []A) (z A, err error) {
 	fmt.Println("q", q)
 	if i < len(ptCases) {
 		fmt.Println("Executing pattern", i)
+		ptCase := ptCases[i]
+		fmt.Println("begin", ptCase.begin, stp-ptCase.begin, "end", ptCase.end, stp-ptCase.end)
+		//arg := stack[stp-ptCase.begin : stp-ptCase.end+1]
+		if r, err :=ptCases[i].funcType[0](jt, stp-ptCase.begin, stp-ptCase.end, stack); err!=nil{
+			return z, err
+		}else{
+			fmt.Println("need to update stack using", r)
+		}
+	} else {
+		fmt.Println("No pattern found")
 	}
 	//for i, ptc = range(ptCases){
 	// 	fmt.Println("i, pattern", i, ptc.pattern)

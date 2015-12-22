@@ -38,8 +38,8 @@ func cid2pdef(idt IDType) A {
 	return NewVerbArray(VAData{})
 }
 
-type dyadFunct func(x, y A) (rv A, err error)
-type monadFunct func(x A) (rv A, err error)
+type dyadFunct func(jt J, x, y A) (rv A, err error)
+type monadFunct func(jt J, x A) (rv A, err error)
 type VAData struct {
 	f1 monadFunct
 	f2 dyadFunct
@@ -55,17 +55,19 @@ type VAData struct {
 }
 
 //	id2pdef[CASGN] = pdef{atype: ASGN, Dyad: asgn} // =.
-func add2(x, w A) (A, error) {
+func add2(jt J, x, w A) (A, error) {
 	ra := NewIntArray(x.Shape)
 	if x.Type == INT && w.Type == INT && x.Length == 1 && w.Length == 1 {
-		ra.Data = make([]int64, x.Length)
-		ra.Data.([]int64)[0] = x.Data.([]int64)[0] + w.Data.([]int64)[0]
+		ra.Data = make([]int, x.Length)
+		ra.Data.([]int)[0] = x.Data.([]int)[0] + w.Data.([]int)[0]
+		fmt.Println("add2 returning", ra)
 		return ra, nil
 	}
+	fmt.Println("add2 failed")
 	return ra, errors.New("Unexpected arrays in add2")
 }
 
-func asgn(a A, w A) (A, error) {
+func asgn(jt J, a A, w A) (A, error) {
 	fmt.Println("In func asgn!")
 	return A{}, nil
 }
