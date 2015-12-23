@@ -1,16 +1,16 @@
 package jingo
 
 import (
-	"fmt"
+	//"fmt"
 	//"os"
 	"strconv"
 	"strings"
 )
 
 func init() {
-	s := "1"
-	i, _ := strconv.Atoi(s)
-	fmt.Println("converted string ", s, i)
+	// s := "1"
+	// i, _ := strconv.Atoi(s)
+	// fmt.Println("converted string ", s, i)
 }
 
 func ToNumber(s string) (n int64, at AType, err error) {

@@ -40,16 +40,50 @@ type Action func(jt J, b, e int, stack []A) (rv A, err error)
 // )
 func dyad(jt J, b, e int, stack []A) (z A, err error) {
 	fmt.Println("In dyad", b, e, stack)
-	if (b-e)!=2 {
+	if (b - e) != 2 {
 		return z, errors.New("Expected 3 pieces in dyad")
 	}
 	fmt.Println("dyad 1st param", stack[e+2])
 	fmt.Println("dyad 2nd param", stack[e])
 	return stack[e+1].Data.(VAData).f2(jt, stack[e+2], stack[e])
 }
-func vdyad(jt J, b, e int, stack []A) (z A, err error) {
-	fmt.Println("In vdyad", b, e, stack)
-	return z, errors.New("vdyad undefined")
+
+func monad(jt J, b, e int, stack []A) (z A, err error) {
+	fmt.Println("In monad (not implemented)", b, e, stack)
+	return
+}
+
+func adv(jt J, b, e int, stack []A) (z A, err error) {
+	fmt.Println("In adv (not implemented)", b, e, stack)
+	return
+}
+
+func conj(jt J, b, e int, stack []A) (z A, err error) {
+	fmt.Println("In conj (not implemented)", b, e, stack)
+	return
+}
+
+func trident(jt J, b, e int, stack []A) (z A, err error) {
+	fmt.Println("In trident (not implemented)", b, e, stack)
+	return
+}
+
+func bident(jt J, b, e int, stack []A) (z A, err error) {
+	fmt.Println("In bident (not implemented", b, e, stack)
+	return
+}
+func vhook(jt J, b, e int, stack []A) (z A, err error) {
+	fmt.Println("In vhook (not implemented)", b, e, stack)
+	return
+}
+func is(jt J, b, e int, stack []A) (z A, err error) {
+	fmt.Println("In is (not implemented)", b, e, stack)
+	return
+}
+
+func punc(jt J, b, e int, stack []A) (z A, err error) {
+	fmt.Println("In punc (not implemented)", b, e, stack)
+	return
 }
 
 const (
@@ -67,16 +101,16 @@ type ptCase struct {
 var ptCases [9]ptCase
 
 func init() {
-	ptCases[0] = ptCase{[4]AType{EDGE + AVN, NOUN, VERB, NOUN}, [2]Action{dyad, vdyad}, 1, 3, 2}
-	// ptCases[0] = ptCase{[4]AType{EDGE, VERB, NOUN, ANY}, [2]Action{monad, vmonad}, 1, 2, 1}
-	// ptCases[1] = ptCase{[4]AType{EDGE + AVN, VERB, VERB, NOUN}, [2]Action{monad, vmonad}, 2, 3, 2}
-	// ptCases[2] = ptCase{[4]AType{EDGE + AVN, NOUN, VERB, NOUN}, [2]Action{dyad, vdyad}, 1, 3, 2}
-	// ptCases[3] = ptCase{[4]AType{EDGE + AVN, VERB + NOUN, ADV, ANY}, [2]Action{adv, vadv}, 1, 2, 1}
-	// ptCases[4] = ptCase{[4]AType{EDGE + AVN, VERB + NOUN, CONJ, VERB + NOUN}, [2]Action{conj, vconj}, 1, 3, 1}
-	// ptCases[5] = ptCase{[4]AType{EDGE + AVN, VERB + NOUN, VERB, VERB}, [2]Action{trident, vfork}, 1, 3, 1}
-	// ptCases[6] = ptCase{[4]AType{EDGE, CAVN, CAVN, ANY}, [2]Action{bident, vhook}, 1, 2, 1}
-	// ptCases[7] = ptCase{[4]AType{NAME + NOUN, ASGN, CAVN, ANY}, [2]Action{is, vis}, 0, 2, 1}
-	// ptCases[8] = ptCase{[4]AType{LPAR, CAVN, RPAR, ANY}, [2]Action{punc, vpunc}, 0, 2, 0}
+	//	ptCases[0] = ptCase{[4]AType{EDGE + AVN, NOUN, VERB, NOUN}, [2]Action{dyad, vdyad}, 1, 3, 2}
+	ptCases[0] = ptCase{[4]AType{EDGE, VERB, NOUN, ANY}, [2]Action{monad, vmonad}, 1, 2, 1}
+	ptCases[1] = ptCase{[4]AType{EDGE + AVN, VERB, VERB, NOUN}, [2]Action{monad, vmonad}, 2, 3, 2}
+	ptCases[2] = ptCase{[4]AType{EDGE + AVN, NOUN, VERB, NOUN}, [2]Action{dyad, vdyad}, 1, 3, 2}
+	ptCases[3] = ptCase{[4]AType{EDGE + AVN, VERB + NOUN, ADV, ANY}, [2]Action{adv, vadv}, 1, 2, 1}
+	ptCases[4] = ptCase{[4]AType{EDGE + AVN, VERB + NOUN, CONJ, VERB + NOUN}, [2]Action{conj, vconj}, 1, 3, 1}
+	ptCases[5] = ptCase{[4]AType{EDGE + AVN, VERB + NOUN, VERB, VERB}, [2]Action{trident, vfork}, 1, 3, 1}
+	ptCases[6] = ptCase{[4]AType{EDGE, CAVN, CAVN, ANY}, [2]Action{bident, vhook}, 1, 2, 1}
+	ptCases[7] = ptCase{[4]AType{NAME + NOUN, ASGN, CAVN, ANY}, [2]Action{is, vis}, 0, 2, 1}
+	ptCases[8] = ptCase{[4]AType{LPAR, CAVN, RPAR, ANY}, [2]Action{punc, vpunc}, 0, 2, 0}
 }
 
 /*  The original from jsoftware.com
@@ -126,7 +160,7 @@ func Parsea(jt J, q []A) (z A, err error) {
 		stp := len(stack) - 1 // stack top pos
 		fmt.Println("top 4 stack", stack[stp-0].Type, stack[stp-1].Type, stack[stp-2].Type, stack[stp-3].Type)
 		for i = 0; i < len(ptCases); i++ {
-			fmt.Println("Checking pattern", i)
+			//fmt.Println("Checking pattern", i)
 			pat := ptCases[i].pattern
 			if ((pat[0] & stack[stp-0].Type) != 0) &&
 				((pat[1] & stack[stp-1].Type) != 0) &&
@@ -147,16 +181,20 @@ func Parsea(jt J, q []A) (z A, err error) {
 	if i < len(ptCases) {
 		fmt.Println("Executing pattern", i)
 		ptCase := ptCases[i]
+		fmt.Println("length of stack", len(stack))
 		fmt.Println("begin", ptCase.begin, stp-ptCase.begin, "end", ptCase.end, stp-ptCase.end)
 		//arg := stack[stp-ptCase.begin : stp-ptCase.end+1]
-		if r, err :=ptCases[i].funcType[0](jt, stp-ptCase.begin, stp-ptCase.end, stack); err!=nil{
+		if r, err := ptCases[i].funcType[0](jt, stp-ptCase.begin, stp-ptCase.end, stack); err != nil {
 			return z, err
-		}else{
+		} else {
 			fmt.Println("need to update stack using", r)
+			fmt.Println("tail of stack", stack[:stp-ptCase.end])
+			stack = append(stack[:stp-ptCase.begin], r)
 		}
 	} else {
 		fmt.Println("No pattern found")
 	}
+	fmt.Println("stack at end of parsea", stack)
 	//for i, ptc = range(ptCases){
 	// 	fmt.Println("i, pattern", i, ptc.pattern)
 	//}

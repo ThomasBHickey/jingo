@@ -79,7 +79,7 @@ const (
 // }
 
 type DST struct { /* 1 2 3                                                        */
-	//struct DS*dclnk;       /* x x x  link to next stack entry                              */
+	dclnk  *DST /* x x x  link to next stack entry                              */
 	dca    A    /*     x  fn/op name                                            */
 	dcf    A    /*     x  fn/op                                                 */
 	dcx    A    /*     x  left argument                                         */
