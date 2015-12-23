@@ -142,8 +142,36 @@ func Parse(jt J, q []A) (z A, err error) {
 	return
 }
 
+func showArraySclice(aslice []A) {
+	for i := 0; i < len(aslice); i++ {
+		a := aslice[i]
+		fmt.Print(" (", i, ":")
+		switch a.Type {
+		case INT:
+			fmt.Print(" INT=", a.Data.([]int)[0], ") ")
+		default:
+			fmt.Print(" ", a.Type, ") ")
+		}
+	}
+	fmt.Println()
+}
+func showArrayScliceR(aslice []A) {
+	for i := len(aslice) - 1; i >= 0; i-- {
+		a := aslice[i]
+		fmt.Print(" (", i, ":")
+		switch a.Type {
+		case INT:
+			fmt.Print(" INT=", a.Data.([]int)[0], ") ")
+		default:
+			fmt.Print(" ", a.Type, ") ")
+		}
+	}
+	fmt.Println()
+}
+
 func Parsea(jt J, q []A) (z A, err error) {
-	fmt.Println("in Parsea", q)
+	fmt.Println("in Parsea")
+	showArraySclice(q)
 	//(NUMERIC | JCHAR | BOX | SBOX | SBT)
 	//fmt.Println("NUMERIC, JCHAR, BOX, SBOX, SBT", NUMERIC, JCHAR, BOX, SBOX, SBT)
 
@@ -156,9 +184,12 @@ func Parsea(jt J, q []A) (z A, err error) {
 	}
 	for {
 		stack = append(stack, q[len(q)-1])
+		fmt.Print("stack to compare")
+		showArrayScliceR(stack)
+		fmt.Println()
 		q = q[0 : len(q)-1]
 		stp := len(stack) - 1 // stack top pos
-		fmt.Println("top 4 stack", stack[stp-0].Type, stack[stp-1].Type, stack[stp-2].Type, stack[stp-3].Type)
+		//fmt.Println("top 4 stack", stack[stp-0].Type, stack[stp-1].Type, stack[stp-2].Type, stack[stp-3].Type)
 		for i = 0; i < len(ptCases); i++ {
 			//fmt.Println("Checking pattern", i)
 			pat := ptCases[i].pattern
@@ -176,27 +207,32 @@ func Parsea(jt J, q []A) (z A, err error) {
 	}
 	fmt.Println("pat pos", i)
 	stp := len(stack) - 1
-	fmt.Println("stack 4 at end", stack[stp-0].Type, stack[stp-1].Type, stack[stp-2].Type, stack[stp-3].Type)
-	fmt.Println("q", q)
+	//fmt.Println("stack 4 at end", stack[stp-0].Type, stack[stp-1].Type, stack[stp-2].Type, stack[stp-3].Type)
+	//fmt.Println("q", q)
 	if i < len(ptCases) {
 		fmt.Println("Executing pattern", i)
 		ptCase := ptCases[i]
+		b, e := ptCase.begin, ptCase.end
+		j, k := stp-b, stp-e
+		//ptCase := ptCases[i]
 		fmt.Println("length of stack", len(stack))
-		fmt.Println("begin", ptCase.begin, stp-ptCase.begin, "end", ptCase.end, stp-ptCase.end)
+		fmt.Println("begin", b, j, "end", e, k)
 		//arg := stack[stp-ptCase.begin : stp-ptCase.end+1]
-		if r, err := ptCases[i].funcType[0](jt, stp-ptCase.begin, stp-ptCase.end, stack); err != nil {
+		if z, err := ptCases[i].funcType[0](jt, j, k, stack); err != nil {
 			return z, err
 		} else {
-			fmt.Println("need to update stack using", r)
-			fmt.Println("tail of stack", stack[:stp-ptCase.end])
-			stack = append(stack[:stp-ptCase.begin], r)
+			fmt.Println("updating stack at", k, "using", z)
+			stack[k] = z
+			showArrayScliceR(stack)
+			stack = stack[:k+1]
+			fmt.Println("stack after trunc")
+			showArrayScliceR(stack)
 		}
 	} else {
 		fmt.Println("No pattern found")
 	}
-	fmt.Println("stack at end of parsea", stack)
-	//for i, ptc = range(ptCases){
-	// 	fmt.Println("i, pattern", i, ptc.pattern)
-	//}
-	return
+	stack = stack[4:]  // drop those 4 MARK arrays
+	fmt.Println("stack at end of parsea")
+	showArrayScliceR(stack)
+	return stack[0], nil
 }
