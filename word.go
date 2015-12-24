@@ -162,7 +162,7 @@ func runeIfNotb(p rune, b bool) rune {
 	return p
 }
 
-func Enqueue(jt J, wps []wp, text string) ([]A, EventType) {
+func Enqueue(jt J, wps []wp, text string) ([]A, Event) {
 	fmt.Println("In word.Enqueue")
 	queue := []A{}
 	var y A

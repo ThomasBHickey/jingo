@@ -5,13 +5,12 @@
 package jingo
 
 import (
-	"errors"
 	"fmt"
 )
 
 //type Action int
 
-type Action func(jt J, b, e int, stack []A) (rv A, err error)
+type Action func(jt J, b, e int, stack []A) (rv A, evn Event)
 
 // const (
 // 	dyad Action = dyadFunct
@@ -38,50 +37,50 @@ type Action func(jt J, b, e int, stack []A) (rv A, err error)
 // 	vmonad
 // 	vpunc
 // )
-func dyad(jt J, b, e int, stack []A) (z A, err error) {
+func dyad(jt J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In dyad", b, e, stack)
 	if (b - e) != 2 {
-		return z, errors.New("Expected 3 pieces in dyad")
+		return z, EVSYNTAX
 	}
 	fmt.Println("dyad 1st param", stack[e+2])
 	fmt.Println("dyad 2nd param", stack[e])
 	return stack[e+1].Data.(VAData).f2(jt, stack[e+2], stack[e])
 }
 
-func monad(jt J, b, e int, stack []A) (z A, err error) {
+func monad(jt J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In monad (not implemented)", b, e, stack)
 	return
 }
 
-func adv(jt J, b, e int, stack []A) (z A, err error) {
+func adv(jt J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In adv (not implemented)", b, e, stack)
 	return
 }
 
-func conj(jt J, b, e int, stack []A) (z A, err error) {
+func conj(jt J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In conj (not implemented)", b, e, stack)
 	return
 }
 
-func trident(jt J, b, e int, stack []A) (z A, err error) {
+func trident(jt J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In trident (not implemented)", b, e, stack)
 	return
 }
 
-func bident(jt J, b, e int, stack []A) (z A, err error) {
+func bident(jt J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In bident (not implemented", b, e, stack)
 	return
 }
-func vhook(jt J, b, e int, stack []A) (z A, err error) {
+func vhook(jt J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In vhook (not implemented)", b, e, stack)
 	return
 }
-func is(jt J, b, e int, stack []A) (z A, err error) {
+func is(jt J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In is (not implemented)", b, e, stack)
 	return
 }
 
-func punc(jt J, b, e int, stack []A) (z A, err error) {
+func punc(jt J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In punc (not implemented)", b, e, stack)
 	return
 }
@@ -126,17 +125,17 @@ PT cases[] = {
  LPAR,      CAVN,      RPAR, ANY,       jtpunc,    jtvpunc,  0,2,0,
 };*/
 
-func Parse(jt J, q []A) (z A, err error) {
+func Parse(jt J, q []A) (z A, evn Event) {
 	fmt.Println("in Parse")
 	// problem:  deba expects an array, but we've got a slice of A's
-	if _, err = deba(jt, DCPARSE, A{}, A{}, A{}); err != nil {
+	if _, evn = deba(jt, DCPARSE, A{}, A{}, A{}); evn != 0 {
 		return
 	}
 	q = append([]A{mark}, append(q, []A{mark, mark, mark, mark}...)...)
-	z, err = Parsea(jt, q)
+	z, evn = Parsea(jt, q)
 	debz()
-	if err != nil {
-		fmt.Println("Error on Parsea", err)
+	if evn != 0 {
+		fmt.Println("Error on Parsea", evn)
 		return
 	}
 	return
@@ -169,7 +168,7 @@ func showArrayScliceR(aslice []A) {
 	fmt.Println()
 }
 
-func Parsea(jt J, q []A) (z A, err error) {
+func Parsea(jt J, q []A) (z A, evn Event) {
 	fmt.Println("in Parsea")
 	showArraySclice(q)
 	//(NUMERIC | JCHAR | BOX | SBOX | SBT)
@@ -218,21 +217,25 @@ func Parsea(jt J, q []A) (z A, err error) {
 		fmt.Println("length of stack", len(stack))
 		fmt.Println("begin", b, j, "end", e, k)
 		//arg := stack[stp-ptCase.begin : stp-ptCase.end+1]
-		if z, err := ptCases[i].funcType[0](jt, j, k, stack); err != nil {
-			return z, err
+		if z, evn := ptCases[i].funcType[0](jt, j, k, stack); evn!=0 {
+			return z, evn
 		} else {
 			fmt.Println("updating stack at", k, "using", z)
 			stack[k] = z
 			showArrayScliceR(stack)
-			stack = stack[:k+1]
+			fmt.Println("changing stack at :k+1 and j:", k+1, j)
+			stack = append(stack[:k+1], stack[j+1:]...)
 			fmt.Println("stack after trunc")
 			showArrayScliceR(stack)
 		}
 	} else {
 		fmt.Println("No pattern found")
 	}
-	stack = stack[4:]  // drop those 4 MARK arrays
+	stack = stack[4:] // drop those 4 MARK arrays
 	fmt.Println("stack at end of parsea")
 	showArrayScliceR(stack)
-	return stack[0], nil
+	if !(((stack[0].Type & CAVN) != 0) && (stack[1].Type == MARK)) {
+		return z, EVSYNTAX
+	}
+	return stack[0], 0
 }

@@ -5,36 +5,36 @@
 package jingo
 
 import (
-	"errors"
+	//"errors"
 	"fmt"
 )
 
-func vdyad(jt J, b, e int, stack []A) (z A, err error) {
+func vdyad(jt J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In vdyad", b, e, stack)
-	return z, errors.New("vdyad undefined")
+	return z, EVSYSTEM
 }
-func vmonad(jt J, b, e int, stack []A) (z A, err error) {
+func vmonad(jt J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In vmonad (not implemented)", b, e, stack)
 	return
 }
-func vadv(jt J, b, e int, stack []A) (z A, err error) {
+func vadv(jt J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In vadv (not implemented)", b, e, stack)
 	return
 }
 
-func vconj(jt J, b, e int, stack []A) (z A, err error) {
+func vconj(jt J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In vconj (not implemented)", b, e, stack)
 	return
 }
-func vfork(jt J, b, e int, stack []A) (z A, err error) {
+func vfork(jt J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In vfork (not implemented", b, e, stack)
 	return
 }
-func vis(jt J, b, e int, stack []A) (z A, err error) {
+func vis(jt J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In vis (not implemented)", b, e, stack)
 	return
 }
-func vpunc(jt J, b, e int, stack []A) (z A, err error) {
+func vpunc(jt J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In vpunc (not implemented)", b, e, stack)
 	return
 }

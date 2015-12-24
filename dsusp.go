@@ -24,7 +24,7 @@ const (
 	DCJUNK
 )
 
-func deba(jt J, t DCType, x, y, fs A) (d []DST, err error) {
+func deba(jt J, t DCType, x, y, fs A) (d []DST, evn Event) {
 	fmt.Println("Call to jtdeba")
 	return
 }

@@ -7,10 +7,10 @@ import (
 	"fmt"
 )
 
-type EventType int
+type Event int
 
 const (
-	EVATTN    EventType = iota + 1
+	EVATTN    Event = iota + 1
 	EVBREAK             //     2
 	EVDOMAIN            //     3
 	EVILNAME            //    4
@@ -47,7 +47,7 @@ const (
 
 /* The following codes are never displayed to the user         */
 const (
-	EWOV    EventType = iota + 50 /* integer overflow            */
+	EWOV    Event = iota + 50 /* integer overflow            */
 	EWIMAG                        //  51      /* imaginery  result           */
 	EWIRR                         //   52      /* irrational result           */
 	EWRAT                         //   53      /* rational   result           */
@@ -55,7 +55,7 @@ const (
 	EWTHROW                       //   55      /* throw. executed             */
 )
 
-var Event2String = map[EventType]string{}
+var Event2String = map[Event]string{}
 
 func init() {
 	Event2String[EVALLOC] = "allocation error"
@@ -98,6 +98,6 @@ func init() {
 	mark = NewArray(MARK, []int{}, nil)
 }
 
-func jsignal2(event EventType, pos wp) {
+func jsignal2(event Event, pos wp) {
 	fmt.Println("jsignal2", Event2String[event], pos)
 }

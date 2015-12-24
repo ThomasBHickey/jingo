@@ -7,7 +7,7 @@ import (
 	"fmt"
 )
 
-func constr(s string) (A, EventType) {
+func constr(s string) (A, Event) {
 	fmt.Println("In constr with", s)
 	return A{}, 0
 }

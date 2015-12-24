@@ -4,7 +4,7 @@
 package jingo
 
 import (
-	"errors"
+	//"errors"
 	"fmt"
 )
 
@@ -38,8 +38,8 @@ func cid2pdef(idt IDType) A {
 	return NewVerbArray(VAData{})
 }
 
-type dyadFunct func(jt J, x, y A) (rv A, err error)
-type monadFunct func(jt J, x A) (rv A, err error)
+type dyadFunct func(jt J, x, y A) (rv A, evn Event)
+type monadFunct func(jt J, x A) (rv A, evn Event)
 type VAData struct {
 	f1 monadFunct
 	f2 dyadFunct
@@ -55,21 +55,21 @@ type VAData struct {
 }
 
 //	id2pdef[CASGN] = pdef{atype: ASGN, Dyad: asgn} // =.
-func add2(jt J, x, w A) (A, error) {
+func add2(jt J, x, w A) (A, Event) {
 	ra := NewIntArray(x.Shape)
 	if x.Type == INT && w.Type == INT && x.Length == 1 && w.Length == 1 {
 		ra.Data = make([]int, x.Length)
 		ra.Data.([]int)[0] = x.Data.([]int)[0] + w.Data.([]int)[0]
 		fmt.Println("add2 returning", ra)
-		return ra, nil
+		return ra, 0
 	}
 	fmt.Println("add2 failed")
-	return ra, errors.New("Unexpected arrays in add2")
+	return ra, EVVALUE
 }
 
-func asgn(jt J, a A, w A) (A, error) {
+func asgn(jt J, a A, w A) (A, Event) {
 	fmt.Println("In func asgn!")
-	return A{}, nil
+	return A{}, 0
 }
 
 type value struct{ z int }
