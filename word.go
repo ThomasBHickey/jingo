@@ -78,12 +78,7 @@ func Scan(jt J, text string) []wp {
 	var e EffType  // effect associated with state
 
 	for bpos, rune := range text {
-		//fmt.Printf("%#U starts at byte position %d\n", rune, bpos)
 		ct := runeToCType(rune)
-		// ct := CA // default current char type
-		// if rune < 128 {
-		// 	ct = ctype[rune]
-		// }
 		fmt.Println("curState", cs, "ctype", ct, "rune", rune)
 		p := state[cs][ct]
 		if e = p.effect; e == EI {
@@ -109,9 +104,6 @@ func Scan(jt J, text string) []wp {
 			t = cs == S9
 		}
 	}
-	//bpos = bpos+1
-	//fmt.Println("finished loop", "cs", cs, "t", t, "nv", nv, "xb", xb, "xe", xe, "b", b, "bpos", bpos)
-	//snpdefs := []snpdef{}
 	if cs == SQ {
 		return wps // needs error condition
 	}
@@ -134,24 +126,6 @@ func Scan(jt J, text string) []wp {
 			fmt.Println("emit 5:", b, len(text), text[b:len(text)])
 		}
 	}
-	// for _, wp := range wps {
-	// 	s := text[wp.Start:wp.End]
-	// 	fmt.Println("wp", s)
-	// 	if len(s) >= 0 {
-	// 		c0 := []rune(s)[0]
-	// 		fmt.Println("wtype", c0, runeToWType(c0), "spellin", spellIn[s])
-	// 		id := spellIn[s]
-	// 		pdef, ok := id2pdef[id]
-	// 		snpdefs = append(snpdefs, snpdef{s: s, id: id, pd: pdef})
-	// 		if ok {
-	// 			dyres, _ := pdef.Dyad(A{}, A{})
-	// 			fmt.Println("pdef dyres", dyres)
-	// 		}
-	// 	}
-	// }
-	// for _, sp := range snpdefs {
-	// 	fmt.Println("s", sp.s, "id", spellOut[sp.id], "pd", sp.pd)
-	// }
 	return wps
 }
 

@@ -222,7 +222,3 @@ const (
 )
 
 //go:generate stringer -type=IDType
-
-// func init() {
-// 	fmt.Println("in jc.go")
-// }

@@ -217,7 +217,7 @@ func Parsea(jt J, q []A) (z A, evn Event) {
 		fmt.Println("length of stack", len(stack))
 		fmt.Println("begin", b, j, "end", e, k)
 		//arg := stack[stp-ptCase.begin : stp-ptCase.end+1]
-		if z, evn := ptCases[i].funcType[0](jt, j, k, stack); evn!=0 {
+		if z, evn := ptCases[i].funcType[0](jt, j, k, stack); evn != 0 {
 			return z, evn
 		} else {
 			fmt.Println("updating stack at", k, "using", z)

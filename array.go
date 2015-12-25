@@ -13,8 +13,6 @@ type AData interface{}
 // J source has additional fields:
 // k: offset of ravel
 // RefCount : reference count
-// flag: indication of memory usage (e.g. AFRO, AFRMM, etc.)
-//       maybe the read only & memory mapped would be useful?
 // m: # bytes in ravel
 
 type A struct {

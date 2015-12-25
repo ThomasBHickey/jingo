@@ -72,12 +72,6 @@ const (
 	LAST0   AType = (B01 | LIT | C2T | NAME)
 )
 
-// func init() {
-// 	fmt.Printf("XZ:  %x\n", XZ)
-// 	fmt.Printf("ANY: %x\n", ANY)
-// 	fmt.Printf("ANY & XZ %x\n", ANY & XZ)
-// }
-
 type DST struct { /* 1 2 3                                                        */
 	dclnk  *DST /* x x x  link to next stack entry                              */
 	dca    A    /*     x  fn/op name                                            */

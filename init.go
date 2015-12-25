@@ -10,49 +10,49 @@ import (
 type Event int
 
 const (
-	EVATTN    Event = iota + 1
-	EVBREAK             //     2
-	EVDOMAIN            //     3
-	EVILNAME            //    4
-	EVILNUM             //  5
-	EVINDEX             //    6
-	EVFACE              //    7
-	EVINPRUPT           //    8
-	EVLENGTH            //    9
-	EVLIMIT             //    10
-	EVNONCE             //    11
-	EVASSERT            //    12
-	EVOPENQ             //    13
-	EVRANK              //    14
-	EVSPELL             //    16
-	EVSTACK             //    17
-	EVSTOP              //    18
-	EVSYNTAX            //    19
-	EVSYSTEM            //    20
-	EVVALUE             //    21
-	EVWSFULL            //    22
-	EVCTRL              //    23
-	EVFACCESS           //    24
-	EVFNAME             //    25
-	EVFNUM              //    26
-	EVTIME              //    27
-	EVSECURE            //    28
-	EVSPARSE            //    29
-	EVLOCALE            //    30
-	EVRO                //    31
-	EVALLOC             //    32
-	EVNAN               //    33
-	NEVM      = EVNAN   /* number of event codes       */
+	EVATTN    Event   = iota + 1
+	EVBREAK           //     2
+	EVDOMAIN          //     3
+	EVILNAME          //    4
+	EVILNUM           //  5
+	EVINDEX           //    6
+	EVFACE            //    7
+	EVINPRUPT         //    8
+	EVLENGTH          //    9
+	EVLIMIT           //    10
+	EVNONCE           //    11
+	EVASSERT          //    12
+	EVOPENQ           //    13
+	EVRANK            //    14
+	EVSPELL           //    16
+	EVSTACK           //    17
+	EVSTOP            //    18
+	EVSYNTAX          //    19
+	EVSYSTEM          //    20
+	EVVALUE           //    21
+	EVWSFULL          //    22
+	EVCTRL            //    23
+	EVFACCESS         //    24
+	EVFNAME           //    25
+	EVFNUM            //    26
+	EVTIME            //    27
+	EVSECURE          //    28
+	EVSPARSE          //    29
+	EVLOCALE          //    30
+	EVRO              //    31
+	EVALLOC           //    32
+	EVNAN             //    33
+	NEVM      = EVNAN /* number of event codes       */
 )
 
 /* The following codes are never displayed to the user         */
 const (
 	EWOV    Event = iota + 50 /* integer overflow            */
-	EWIMAG                        //  51      /* imaginery  result           */
-	EWIRR                         //   52      /* irrational result           */
-	EWRAT                         //   53      /* rational   result           */
-	EWDIV0                        //   54      /* division by zero            */
-	EWTHROW                       //   55      /* throw. executed             */
+	EWIMAG                    //  51      /* imaginery  result           */
+	EWIRR                     //   52      /* irrational result           */
+	EWRAT                     //   53      /* rational   result           */
+	EWDIV0                    //   54      /* division by zero            */
+	EWTHROW                   //   55      /* throw. executed             */
 )
 
 var Event2String = map[Event]string{}
