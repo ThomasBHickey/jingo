@@ -10,7 +10,7 @@ import (
 
 //type Action int
 
-type Action func(jt J, b, e int, stack []A) (rv A, evn Event)
+type Action func(jt *J, b, e int, stack []A) (rv A, evn Event)
 
 // const (
 // 	dyad Action = dyadFunct
@@ -37,7 +37,7 @@ type Action func(jt J, b, e int, stack []A) (rv A, evn Event)
 // 	vmonad
 // 	vpunc
 // )
-func dyad(jt J, b, e int, stack []A) (z A, evn Event) {
+func dyad(jt *J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In dyad", b, e, stack)
 	if (b - e) != 2 {
 		return z, EVSYNTAX
@@ -47,40 +47,40 @@ func dyad(jt J, b, e int, stack []A) (z A, evn Event) {
 	return stack[e+1].Data.(VAData).f2(jt, stack[e+2], stack[e])
 }
 
-func monad(jt J, b, e int, stack []A) (z A, evn Event) {
+func monad(jt *J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In monad (not implemented)", b, e, stack)
 	return
 }
 
-func adv(jt J, b, e int, stack []A) (z A, evn Event) {
+func adv(jt *J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In adv (not implemented)", b, e, stack)
 	return
 }
 
-func conj(jt J, b, e int, stack []A) (z A, evn Event) {
+func conj(jt *J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In conj (not implemented)", b, e, stack)
 	return
 }
 
-func trident(jt J, b, e int, stack []A) (z A, evn Event) {
+func trident(jt *J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In trident (not implemented)", b, e, stack)
 	return
 }
 
-func bident(jt J, b, e int, stack []A) (z A, evn Event) {
+func bident(jt *J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In bident (not implemented", b, e, stack)
 	return
 }
-func vhook(jt J, b, e int, stack []A) (z A, evn Event) {
+func vhook(jt *J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In vhook (not implemented)", b, e, stack)
 	return
 }
-func is(jt J, b, e int, stack []A) (z A, evn Event) {
+func is(jt *J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In is (not implemented)", b, e, stack)
 	return
 }
 
-func punc(jt J, b, e int, stack []A) (z A, evn Event) {
+func punc(jt *J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In punc (not implemented)", b, e, stack)
 	return
 }
@@ -125,7 +125,7 @@ PT cases[] = {
  LPAR,      CAVN,      RPAR, ANY,       jtpunc,    jtvpunc,  0,2,0,
 };*/
 
-func Parse(jt J, q []A) (z A, evn Event) {
+func Parse(jt *J, q []A) (z A, evn Event) {
 	fmt.Println("in Parse")
 	// problem:  deba expects an array, but we've got a slice of A's
 	if _, evn = deba(jt, DCPARSE, A{}, A{}, A{}); evn != 0 {
@@ -168,11 +168,12 @@ func showArrayScliceR(aslice []A) {
 	fmt.Println()
 }
 
-func Parsea(jt J, q []A) (z A, evn Event) {
+func Parsea(jt *J, q []A) (z A, evn Event) {
 	fmt.Println("in Parsea")
 	showArraySclice(q)
-	//(NUMERIC | JCHAR | BOX | SBOX | SBT)
-	//fmt.Println("NUMERIC, JCHAR, BOX, SBOX, SBT", NUMERIC, JCHAR, BOX, SBOX, SBT)
+	if len(q)==0{return z, EVVALUE}
+	jt.asgn = false
+	jt.parsercalls++
 
 	var i int
 	//var ptc ptCase
@@ -213,11 +214,14 @@ func Parsea(jt J, q []A) (z A, evn Event) {
 		ptCase := ptCases[i]
 		b, e := ptCase.begin, ptCase.end
 		j, k := stp-b, stp-e
-		//ptCase := ptCases[i]
 		fmt.Println("length of stack", len(stack))
 		fmt.Println("begin", b, j, "end", e, k)
-		//arg := stack[stp-ptCase.begin : stp-ptCase.end+1]
-		if z, evn := ptCases[i].funcType[0](jt, j, k, stack); evn != 0 {
+		f := ptCase.funcType[0]
+		fmt.Println("stack[e+1].Data.(VAData).f2",stack[k+1].Data.(VAData).f2)
+		jt.asgn = stack[k+1].Data.(VAData).isAsgn
+		fmt.Println("jt.asgn", jt.asgn)
+		//jt.asgn = f==asgnID
+		if z, evn := f(jt, j, k, stack); evn != 0 {
 			return z, evn
 		} else {
 			fmt.Println("updating stack at", k, "using", z)

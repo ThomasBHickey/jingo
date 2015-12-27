@@ -13,7 +13,7 @@ func main() {
 	fmt.Print("> ")
 	text, _ := reader.ReadString('\n')
 	ttext := strings.TrimSpace(text)
-	jt := jingo.J{}
+	jt := &jingo.J{}
 	wps := jingo.Scan(jt, ttext)
 	fmt.Println("wps")
 	for _, w := range wps {

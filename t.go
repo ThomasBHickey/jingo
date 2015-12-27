@@ -38,14 +38,15 @@ func cid2pdef(idt IDType) A {
 	return NewVerbArray(VAData{})
 }
 
-type dyadFunct func(jt J, x, y A) (rv A, evn Event)
-type monadFunct func(jt J, x A) (rv A, evn Event)
+type dyadFunct func(jt *J, x, y A) (rv A, evn Event)
+type monadFunct func(jt *J, x A) (rv A, evn Event)
 type VAData struct {
 	f1 monadFunct
 	f2 dyadFunct
 	f, // left conj or adverb argument
 	g, // right conj. argument
 	h A // auxiliary argument
+	isAsgn bool
 	flag bool //not sure what gets flagged
 	mr,  // monadic rank
 	lr, // left dyadic rank
@@ -55,7 +56,7 @@ type VAData struct {
 }
 
 //	id2pdef[CASGN] = pdef{atype: ASGN, Dyad: asgn} // =.
-func add2(jt J, x, w A) (A, Event) {
+func add2(jt *J, x, w A) (A, Event) {
 	ra := NewIntArray(x.Shape)
 	if x.Type == INT && w.Type == INT && x.Length == 1 && w.Length == 1 {
 		ra.Data = make([]int, x.Length)
@@ -67,7 +68,7 @@ func add2(jt J, x, w A) (A, Event) {
 	return ra, EVVALUE
 }
 
-func asgn(jt J, a A, w A) (A, Event) {
+func asgn(jt *J, a A, w A) (A, Event) {
 	fmt.Println("In func asgn!")
 	return A{}, 0
 }
@@ -76,6 +77,6 @@ type value struct{ z int }
 
 func init() {
 	fmt.Println("Hi from t.go!")
-	id2pdef[CASGN] = NewVerbArray(VAData{f2: asgn, id: CASGN})
+	id2pdef[CASGN] = NewVerbArray(VAData{f2: asgn, id: CASGN, isAsgn:true})
 	id2pdef[CPLUS] = NewVerbArray(VAData{f2: add2})
 }

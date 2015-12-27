@@ -9,32 +9,32 @@ import (
 	"fmt"
 )
 
-func vdyad(jt J, b, e int, stack []A) (z A, evn Event) {
+func vdyad(jt *J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In vdyad", b, e, stack)
 	return z, EVSYSTEM
 }
-func vmonad(jt J, b, e int, stack []A) (z A, evn Event) {
+func vmonad(jt *J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In vmonad (not implemented)", b, e, stack)
 	return
 }
-func vadv(jt J, b, e int, stack []A) (z A, evn Event) {
+func vadv(jt *J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In vadv (not implemented)", b, e, stack)
 	return
 }
 
-func vconj(jt J, b, e int, stack []A) (z A, evn Event) {
+func vconj(jt *J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In vconj (not implemented)", b, e, stack)
 	return
 }
-func vfork(jt J, b, e int, stack []A) (z A, evn Event) {
+func vfork(jt *J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In vfork (not implemented", b, e, stack)
 	return
 }
-func vis(jt J, b, e int, stack []A) (z A, evn Event) {
+func vis(jt *J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In vis (not implemented)", b, e, stack)
 	return
 }
-func vpunc(jt J, b, e int, stack []A) (z A, evn Event) {
+func vpunc(jt *J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In vpunc (not implemented)", b, e, stack)
 	return
 }

@@ -4,10 +4,12 @@
 package jingo
 
 // from jt.h:
+type J struct {
 // typedef struct {
 //  C*   adbreak;			/* must be first! ad mapped shared file break flag */
 //  I    arg;              /* integer argument                                */
 //  B    asgn;             /* 1 iff last operation on this line is assignment */
+	asgn bool
 //  B    assert;           /* 1 iff evaluate assert. statements               */
 //  I*   breakfh;          /* win break file handle                           */
 //  C    breakfn[NPATH];   /* break file name                                 */
@@ -136,6 +138,7 @@ package jingo
 //  I    outmaxlen;        /* output: maximum line length before truncation   */
 //  C    outseq[3];		/* EOL: "LF" "CR" "CRLF"                           */
 //  I    parsercalls;      /* # times parser was called                       */
+	parsercalls int
 //  A    pma;              /* perf. monitor: data area                        */
 //  I    pmctr;            /* perf. monitor: ctr>0 means do monitoring        */
 //  B    pmrec;            /* perf. monitor: 0 entry/exit; 1 all              */
@@ -225,6 +228,5 @@ package jingo
 // } JST;
 
 // typedef JST* J;
-
-type J struct {
 }
+
