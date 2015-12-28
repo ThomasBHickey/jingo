@@ -171,7 +171,9 @@ func showArrayScliceR(aslice []A) {
 func Parsea(jt *J, q []A) (z A, evn Event) {
 	fmt.Println("in Parsea")
 	showArraySclice(q)
-	if len(q)==0{return z, EVVALUE}
+	if len(q) == 0 {
+		return z, EVVALUE
+	}
 	jt.asgn = false
 	jt.parsercalls++
 
@@ -217,7 +219,7 @@ func Parsea(jt *J, q []A) (z A, evn Event) {
 		fmt.Println("length of stack", len(stack))
 		fmt.Println("begin", b, j, "end", e, k)
 		f := ptCase.funcType[0]
-		fmt.Println("stack[e+1].Data.(VAData).f2",stack[k+1].Data.(VAData).f2)
+		fmt.Println("stack[e+1].Data.(VAData).f2", stack[k+1].Data.(VAData).f2)
 		jt.asgn = stack[k+1].Data.(VAData).isAsgn
 		fmt.Println("jt.asgn", jt.asgn)
 		//jt.asgn = f==asgnID

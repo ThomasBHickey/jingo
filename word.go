@@ -140,7 +140,7 @@ func Enqueue(jt *J, wps []wp, text string) ([]A, Event) {
 	fmt.Println("In word.Enqueue")
 	queue := []A{}
 	var y A
-	var b bool
+	var b, ok bool
 	for _, wp := range wps {
 		s := text[wp.Start:wp.End] // string in utf-8
 		runes := ([]rune)(s)
@@ -158,16 +158,24 @@ func Enqueue(jt *J, wps []wp, text string) ([]A, Event) {
 				fmt.Println("b is true, e:", e)
 			}
 		}
-		if y = cid2pdef(e); y.Type != NoAType {
-			y = id2pdef[e]
-			fmt.Println("c<128, y=", y)
-		}
-		y, ok := id2pdef[e]
+		// if y = cid2pdef(e); y.Type != NoAType {
+		// 	//y = id2pdef[e]
+		// 	fmt.Println("c<128, y=", y)
+		// }
+		// fmt.Println("y.Type", y.Type)
+		y, ok = cid2pdef(c, e)
+		fmt.Println("y, ok from cid2pdef(c, e)", y, ok)
 		if ok {
 			fmt.Println("c<128, e=", e, "ok", ok, "y=id2pdef[e]", y)
 			queue = append(queue, y)
+			fmt.Println("queue", queue)
+		} else if e == CFCONS {
+			fmt.Println("Unexpected CFCONS")
+			return queue, EVSPELL
 		} else if b {
 			fmt.Println("UNEXPECTED b?")
+			jsignal2(EVSPELL, wp)
+			return queue, EVSPELL
 		} else {
 			switch p {
 			case C9:
@@ -182,6 +190,15 @@ func Enqueue(jt *J, wps []wp, text string) ([]A, Event) {
 					return queue, err
 				}
 				queue = append(queue, x)
+			case CA:
+				if vnm(jt, s) {
+					return queue, EVILNAME
+				}
+				y, ok = nfs(jt, s)
+				if !ok {
+					return queue, 0
+				}
+				queue = append(queue, y)
 			default:
 				jsignal2(EVSPELL, wp)
 				return queue, EVSPELL

@@ -31,11 +31,12 @@ func init() {
 
 var id2pdef = map[IDType]A{}
 
-func cid2pdef(idt IDType) A {
-	if idt < 128 {
-		return id2pdef[idt]
+func cid2pdef(c rune, idt IDType) (z A, OK bool) {
+	if c < 128 {
+		z = id2pdef[idt]
+		return z, z.Type != NoAType
 	}
-	return NewVerbArray(VAData{})
+	return
 }
 
 type dyadFunct func(jt *J, x, y A) (rv A, evn Event)
@@ -47,8 +48,8 @@ type VAData struct {
 	g, // right conj. argument
 	h A // auxiliary argument
 	isAsgn bool
-	flag bool //not sure what gets flagged
-	mr,  // monadic rank
+	flag   bool //not sure what gets flagged
+	mr,    // monadic rank
 	lr, // left dyadic rank
 	rr, // right dyadic rank
 	funcDepth int
@@ -77,6 +78,6 @@ type value struct{ z int }
 
 func init() {
 	fmt.Println("Hi from t.go!")
-	id2pdef[CASGN] = NewVerbArray(VAData{f2: asgn, id: CASGN, isAsgn:true})
+	id2pdef[CASGN] = NewVerbArray(VAData{f2: asgn, id: CASGN, isAsgn: true})
 	id2pdef[CPLUS] = NewVerbArray(VAData{f2: add2})
 }
