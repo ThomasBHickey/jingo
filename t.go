@@ -32,6 +32,7 @@ func init() {
 var id2pdef = map[IDType]A{}
 
 func cid2pdef(c rune, idt IDType) (z A, OK bool) {
+	fmt.Println("cdi2pdef looking for idt", idt, "c", string(c))
 	if c < 128 {
 		z = id2pdef[idt]
 		return z, z.Type != NoAType
@@ -78,6 +79,6 @@ type value struct{ z int }
 
 func init() {
 	fmt.Println("Hi from t.go!")
-	id2pdef[CASGN] = NewVerbArray(VAData{f2: asgn, id: CASGN, isAsgn: true})
+	id2pdef[CASGN] = NewASGNArray(VAData{f2: asgn, id: CASGN, isAsgn: true})
 	id2pdef[CPLUS] = NewVerbArray(VAData{f2: add2})
 }

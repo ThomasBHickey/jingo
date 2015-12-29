@@ -4,6 +4,16 @@
 package jingo
 
 // from jt.h:
+func GetJ() *J {
+	jt := J{symb: map[string]A{}}
+	//	initJ(&jt)
+	return &jt
+}
+
+// func initJ(jt *J){
+// 	jt.symb = map[string]A{}
+// return
+// }
 type J struct {
 	// typedef struct {
 	//  C*   adbreak;			/* must be first! ad mapped shared file break flag */
@@ -45,6 +55,7 @@ type J struct {
 	//  UI   ctmask;           /* 1 iff significant wrt ct; for i. and i:         */
 	//  A    curlocn;          /* current locale name corresp. to curname         */
 	//  A    curname;          /* current name                                    */
+	curname A
 	//  L*   cursymb;          /* current symbol table entry                      */
 	//  I    db;               /* debug flag; see 13!:0                           */
 	//  A    dbalpha;          /* left  argument for rerun                        */
@@ -204,6 +215,7 @@ type J struct {
 	//  B    stswitched;       /* called fn switched locale                       */
 	//  I    stused;           /* entries in stnum/stptr in use                   */
 	//  A    symb;             /* symbol table for assignment                     */
+	symb map[string]A
 	//  I    symindex;         /* symbol table index (monotonically increasing)   */
 	//  A    symp;             /* symbol pool array                               */
 	//  L*   sympv;            /* symbol pool array value ptr, (L*)AV(jt->symp)   */

@@ -86,9 +86,10 @@ func punc(jt *J, b, e int, stack []A) (z A, evn Event) {
 }
 
 const (
-	AVN  AType = ADV | VERB | NOUN
-	CAVN AType = CONJ | ADV | VERB | NOUN
-	EDGE AType = MARK | ASGN | LPAR
+	AVN      AType = ADV | VERB | NOUN
+	CAVN     AType = CONJ | ADV | VERB | NOUN
+	EDGE     AType = MARK | ASGN | LPAR
+	NAMENOUN AType = NAME | NOUN
 )
 
 type ptCase struct {
@@ -100,7 +101,6 @@ type ptCase struct {
 var ptCases [9]ptCase
 
 func init() {
-	//	ptCases[0] = ptCase{[4]AType{EDGE + AVN, NOUN, VERB, NOUN}, [2]Action{dyad, vdyad}, 1, 3, 2}
 	ptCases[0] = ptCase{[4]AType{EDGE, VERB, NOUN, ANY}, [2]Action{monad, vmonad}, 1, 2, 1}
 	ptCases[1] = ptCase{[4]AType{EDGE + AVN, VERB, VERB, NOUN}, [2]Action{monad, vmonad}, 2, 3, 2}
 	ptCases[2] = ptCase{[4]AType{EDGE + AVN, NOUN, VERB, NOUN}, [2]Action{dyad, vdyad}, 1, 3, 2}
@@ -108,7 +108,8 @@ func init() {
 	ptCases[4] = ptCase{[4]AType{EDGE + AVN, VERB + NOUN, CONJ, VERB + NOUN}, [2]Action{conj, vconj}, 1, 3, 1}
 	ptCases[5] = ptCase{[4]AType{EDGE + AVN, VERB + NOUN, VERB, VERB}, [2]Action{trident, vfork}, 1, 3, 1}
 	ptCases[6] = ptCase{[4]AType{EDGE, CAVN, CAVN, ANY}, [2]Action{bident, vhook}, 1, 2, 1}
-	ptCases[7] = ptCase{[4]AType{NAME + NOUN, ASGN, CAVN, ANY}, [2]Action{is, vis}, 0, 2, 1}
+	//ptCases[7] = ptCase{[4]AType{NAME + NOUN, ASGN, CAVN, ANY}, [2]Action{is, vis}, 0, 2, 1}
+	ptCases[7] = ptCase{[4]AType{NAMENOUN, ASGN, CAVN, ANY}, [2]Action{is, vis}, 0, 2, 1}
 	ptCases[8] = ptCase{[4]AType{LPAR, CAVN, RPAR, ANY}, [2]Action{punc, vpunc}, 0, 2, 0}
 }
 
@@ -187,19 +188,29 @@ func Parsea(jt *J, q []A) (z A, evn Event) {
 	for {
 		stack = append(stack, q[len(q)-1])
 		fmt.Print("stack to compare")
+		//dbg := len(stack) == 7
 		showArrayScliceR(stack)
 		fmt.Println()
 		q = q[0 : len(q)-1]
 		stp := len(stack) - 1 // stack top pos
 		//fmt.Println("top 4 stack", stack[stp-0].Type, stack[stp-1].Type, stack[stp-2].Type, stack[stp-3].Type)
 		for i = 0; i < len(ptCases); i++ {
-			//fmt.Println("Checking pattern", i)
 			pat := ptCases[i].pattern
+			// if dbg {
+			// 	fmt.Println("Checking pattern", i, pat)
+			// }
+			// if dbg && i == 7 {
+			// 	for j := 0; j < 4; j++ {
+			// 		fmt.Print(pat[j], stack[stp-j].Type, pat[j]&stack[stp-j].Type)
+			// 		fmt.Print(", ")
+			// 	}
+			// 	fmt.Println()
+			//}
 			if ((pat[0] & stack[stp-0].Type) != 0) &&
 				((pat[1] & stack[stp-1].Type) != 0) &&
 				((pat[2] & stack[stp-2].Type) != 0) &&
 				((pat[3] & stack[stp-3].Type) != 0) {
-				fmt.Println("found match", i)
+				fmt.Println("found match", i, "length of q", len(q))
 				break
 			}
 		}
@@ -220,7 +231,7 @@ func Parsea(jt *J, q []A) (z A, evn Event) {
 		fmt.Println("begin", b, j, "end", e, k)
 		f := ptCase.funcType[0]
 		fmt.Println("stack[e+1].Data.(VAData).f2", stack[k+1].Data.(VAData).f2)
-		jt.asgn = stack[k+1].Data.(VAData).isAsgn
+		jt.asgn = stack[k+1].Type==ASGN
 		fmt.Println("jt.asgn", jt.asgn)
 		//jt.asgn = f==asgnID
 		if z, evn := f(jt, j, k, stack); evn != 0 {

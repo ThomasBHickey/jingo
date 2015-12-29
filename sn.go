@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func vnm(jt *J, s string) bool {
+func valnm(jt *J, s string) bool {
 	if len(s) == 0 {
 		return false
 	}
@@ -32,7 +32,7 @@ func vnm(jt *J, s string) bool {
 		// 	d:= c
 	}
 	if strings.ContainsRune(s, '_') {
-		fmt.Println("underscore found in vnm")
+		fmt.Println("underscore found in valnm")
 		return false
 	}
 	return true
@@ -40,6 +40,12 @@ func vnm(jt *J, s string) bool {
 
 // Name from string
 func nfs(jt *J, s string) (z A, ok bool) {
-	fmt.Println("in nfs (not implemented), passed", s)
-	return
+	ts := strings.Trim(s, " ")
+	if len(ts) == 0 {
+		return
+	}
+	z = NewNameArray(ts)
+	jt.symb[s] = z
+	//fmt.Println("in nfs (not implemented), passed", s)
+	return z, true
 }

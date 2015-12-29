@@ -149,6 +149,7 @@ func Enqueue(jt *J, wps []wp, text string) ([]A, Event) {
 		c := runes[0]
 		e := IDType(c)
 		p := runeToCType(c)
+		b = false
 		fmt.Println("p: ctype[firstchar]", p)
 		if wl > 1 {
 			d := ESCType(runes[len(runes)-1])
@@ -191,12 +192,14 @@ func Enqueue(jt *J, wps []wp, text string) ([]A, Event) {
 				}
 				queue = append(queue, x)
 			case CA:
-				if vnm(jt, s) {
-					return queue, EVILNAME
+				if !valnm(jt, s) {
+					jt.curname, _ = nfs(jt, s)
+					return []A{}, EVILNAME
 				}
+				fmt.Println("valnm OK")
 				y, ok = nfs(jt, s)
 				if !ok {
-					return queue, 0
+					return []A{}, EVILNAME
 				}
 				queue = append(queue, y)
 			default:
