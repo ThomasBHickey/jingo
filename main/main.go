@@ -26,5 +26,6 @@ func main() {
 		fmt.Println("enqueue", q)
 		z, err := jingo.Parse(jt, q)
 		fmt.Println("result of Parse", err, z)
+		fmt.Println("jt.symb[b]", jt.Symb["b"])
 	}
 }

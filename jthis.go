@@ -5,21 +5,22 @@ package jingo
 
 // from jt.h:
 func GetJ() *J {
-	jt := J{symb: map[string]A{}}
-	//	initJ(&jt)
+	jt := J{}
+	initJ(&jt)
 	return &jt
 }
 
-// func initJ(jt *J){
-// 	jt.symb = map[string]A{}
-// return
-// }
+func initJ(jt *J) {
+	jt.Symb = map[string]A{}
+	return
+}
+
 type J struct {
 	// typedef struct {
 	//  C*   adbreak;			/* must be first! ad mapped shared file break flag */
 	//  I    arg;              /* integer argument                                */
 	//  B    asgn;             /* 1 iff last operation on this line is assignment */
-	asgn bool
+	Asgn bool
 	//  B    assert;           /* 1 iff evaluate assert. statements               */
 	//  I*   breakfh;          /* win break file handle                           */
 	//  C    breakfn[NPATH];   /* break file name                                 */
@@ -55,7 +56,7 @@ type J struct {
 	//  UI   ctmask;           /* 1 iff significant wrt ct; for i. and i:         */
 	//  A    curlocn;          /* current locale name corresp. to curname         */
 	//  A    curname;          /* current name                                    */
-	curname A
+	Curname A
 	//  L*   cursymb;          /* current symbol table entry                      */
 	//  I    db;               /* debug flag; see 13!:0                           */
 	//  A    dbalpha;          /* left  argument for rerun                        */
@@ -85,7 +86,7 @@ type J struct {
 	//  I    disp[7];          /* # different verb displays                       */
 	//  I    dlllasterror;     /* DLL stuff                                       */
 	//  B    dotnames;         /* 1 iff x. y. etc. names are permitted            */
-	dotnames bool
+	Dotnames bool
 	//  void*dtoa;             /* use internally by dtoa.c                        */
 	//  C    etx[1+NETX];      /* display text for last error (+1 for trailing 0) */
 	//  I    etxn;             /* strlen(etx)                                     */
@@ -150,7 +151,7 @@ type J struct {
 	//  I    outmaxlen;        /* output: maximum line length before truncation   */
 	//  C    outseq[3];		/* EOL: "LF" "CR" "CRLF"                           */
 	//  I    parsercalls;      /* # times parser was called                       */
-	parsercalls int
+	Parsercalls int
 	//  A    pma;              /* perf. monitor: data area                        */
 	//  I    pmctr;            /* perf. monitor: ctr>0 means do monitoring        */
 	//  B    pmrec;            /* perf. monitor: 0 entry/exit; 1 all              */
@@ -215,7 +216,7 @@ type J struct {
 	//  B    stswitched;       /* called fn switched locale                       */
 	//  I    stused;           /* entries in stnum/stptr in use                   */
 	//  A    symb;             /* symbol table for assignment                     */
-	symb map[string]A
+	Symb map[string]A
 	//  I    symindex;         /* symbol table index (monotonically increasing)   */
 	//  A    symp;             /* symbol pool array                               */
 	//  L*   sympv;            /* symbol pool array value ptr, (L*)AV(jt->symp)   */

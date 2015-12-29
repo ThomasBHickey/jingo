@@ -48,9 +48,9 @@ type VAData struct {
 	f, // left conj or adverb argument
 	g, // right conj. argument
 	h A // auxiliary argument
-	isAsgn bool
-	flag   bool //not sure what gets flagged
-	mr,    // monadic rank
+	//isAsgn bool
+	flag bool //not sure what gets flagged
+	mr,  // monadic rank
 	lr, // left dyadic rank
 	rr, // right dyadic rank
 	funcDepth int
@@ -72,13 +72,16 @@ func add2(jt *J, x, w A) (A, Event) {
 
 func asgn(jt *J, a A, w A) (A, Event) {
 	fmt.Println("In func asgn!")
-	return A{}, 0
+	fmt.Println("param a", a)
+	fmt.Println("w", w)
+	jt.Symb[a.Data.(NameData).name] = w
+	return w, 0
 }
 
 type value struct{ z int }
 
 func init() {
 	fmt.Println("Hi from t.go!")
-	id2pdef[CASGN] = NewASGNArray(VAData{f2: asgn, id: CASGN, isAsgn: true})
+	id2pdef[CASGN] = NewASGNArray(VAData{f2: asgn, id: CASGN})
 	id2pdef[CPLUS] = NewVerbArray(VAData{f2: add2})
 }

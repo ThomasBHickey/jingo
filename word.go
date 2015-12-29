@@ -193,7 +193,7 @@ func Enqueue(jt *J, wps []wp, text string) ([]A, Event) {
 				queue = append(queue, x)
 			case CA:
 				if !valnm(jt, s) {
-					jt.curname, _ = nfs(jt, s)
+					jt.Curname, _ = nfs(jt, s)
 					return []A{}, EVILNAME
 				}
 				fmt.Println("valnm OK")

@@ -38,7 +38,8 @@ type Action func(jt *J, b, e int, stack []A) (rv A, evn Event)
 // 	vpunc
 // )
 func dyad(jt *J, b, e int, stack []A) (z A, evn Event) {
-	fmt.Println("In dyad", b, e, stack)
+	fmt.Println("In dyad", b, e)
+	showArrayScliceR(stack)
 	if (b - e) != 2 {
 		return z, EVSYNTAX
 	}
@@ -76,8 +77,14 @@ func vhook(jt *J, b, e int, stack []A) (z A, evn Event) {
 	return
 }
 func is(jt *J, b, e int, stack []A) (z A, evn Event) {
-	fmt.Println("In is (not implemented)", b, e, stack)
-	return
+	fmt.Println("In 'is'", b, e)
+	showArrayScliceR(stack)
+	if (b - e) != 2 {
+		return z, EVSYNTAX
+	}
+	fmt.Println("is 1st param", stack[e+2])
+	fmt.Println("is 2nd param", stack[e])
+	return stack[e+1].Data.(VAData).f2(jt, stack[e+2], stack[e])
 }
 
 func punc(jt *J, b, e int, stack []A) (z A, evn Event) {
@@ -94,7 +101,7 @@ const (
 
 type ptCase struct {
 	pattern       [4]AType
-	funcType      [2]Action
+	actions       [2]Action
 	begin, end, k int // don't know what k is yet
 }
 
@@ -175,8 +182,8 @@ func Parsea(jt *J, q []A) (z A, evn Event) {
 	if len(q) == 0 {
 		return z, EVVALUE
 	}
-	jt.asgn = false
-	jt.parsercalls++
+	jt.Asgn = false
+	jt.Parsercalls++
 
 	var i int
 	//var ptc ptCase
@@ -188,24 +195,13 @@ func Parsea(jt *J, q []A) (z A, evn Event) {
 	for {
 		stack = append(stack, q[len(q)-1])
 		fmt.Print("stack to compare")
-		//dbg := len(stack) == 7
 		showArrayScliceR(stack)
 		fmt.Println()
 		q = q[0 : len(q)-1]
 		stp := len(stack) - 1 // stack top pos
-		//fmt.Println("top 4 stack", stack[stp-0].Type, stack[stp-1].Type, stack[stp-2].Type, stack[stp-3].Type)
 		for i = 0; i < len(ptCases); i++ {
 			pat := ptCases[i].pattern
-			// if dbg {
-			// 	fmt.Println("Checking pattern", i, pat)
-			// }
-			// if dbg && i == 7 {
-			// 	for j := 0; j < 4; j++ {
-			// 		fmt.Print(pat[j], stack[stp-j].Type, pat[j]&stack[stp-j].Type)
-			// 		fmt.Print(", ")
-			// 	}
-			// 	fmt.Println()
-			//}
+
 			if ((pat[0] & stack[stp-0].Type) != 0) &&
 				((pat[1] & stack[stp-1].Type) != 0) &&
 				((pat[2] & stack[stp-2].Type) != 0) &&
@@ -214,39 +210,37 @@ func Parsea(jt *J, q []A) (z A, evn Event) {
 				break
 			}
 		}
+		fmt.Println("pat pos", i)
+		stp = len(stack) - 1
+		if i < len(ptCases) {
+			fmt.Println("Executing pattern", i)
+			ptCase := ptCases[i]
+			b, e := ptCase.begin, ptCase.end
+			j, k := stp-b, stp-e
+			fmt.Println("length of stack", len(stack))
+			fmt.Println("begin", b, j, "end", e, k)
+			f := ptCase.actions[0]
+			fmt.Println("stack[e+1].Data.(VAData).f2", stack[k+1].Data.(VAData).f2)
+			jt.Asgn = stack[k+1].Type == ASGN
+			fmt.Println("jt.Asgn", jt.Asgn)
+			if z, evn := f(jt, j, k, stack); evn != 0 {
+				fmt.Println("Non zero event from f call", evn)
+				return z, evn
+			} else {
+				fmt.Println("updating stack at", k, "using", z)
+				stack[k] = z
+				showArrayScliceR(stack)
+				fmt.Println("changing stack at :k+1 and j:", k+1, j)
+				stack = append(stack[:k+1], stack[j+1:]...)
+				fmt.Println("stack after trunc")
+				showArrayScliceR(stack)
+			}
+		} else {
+			fmt.Println("No pattern found")
+		}
 		if len(q) < 1 {
 			break
 		}
-	}
-	fmt.Println("pat pos", i)
-	stp := len(stack) - 1
-	//fmt.Println("stack 4 at end", stack[stp-0].Type, stack[stp-1].Type, stack[stp-2].Type, stack[stp-3].Type)
-	//fmt.Println("q", q)
-	if i < len(ptCases) {
-		fmt.Println("Executing pattern", i)
-		ptCase := ptCases[i]
-		b, e := ptCase.begin, ptCase.end
-		j, k := stp-b, stp-e
-		fmt.Println("length of stack", len(stack))
-		fmt.Println("begin", b, j, "end", e, k)
-		f := ptCase.funcType[0]
-		fmt.Println("stack[e+1].Data.(VAData).f2", stack[k+1].Data.(VAData).f2)
-		jt.asgn = stack[k+1].Type==ASGN
-		fmt.Println("jt.asgn", jt.asgn)
-		//jt.asgn = f==asgnID
-		if z, evn := f(jt, j, k, stack); evn != 0 {
-			return z, evn
-		} else {
-			fmt.Println("updating stack at", k, "using", z)
-			stack[k] = z
-			showArrayScliceR(stack)
-			fmt.Println("changing stack at :k+1 and j:", k+1, j)
-			stack = append(stack[:k+1], stack[j+1:]...)
-			fmt.Println("stack after trunc")
-			showArrayScliceR(stack)
-		}
-	} else {
-		fmt.Println("No pattern found")
 	}
 	stack = stack[4:] // drop those 4 MARK arrays
 	fmt.Println("stack at end of parsea")

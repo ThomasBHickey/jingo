@@ -13,7 +13,7 @@ func valnm(jt *J, s string) bool {
 		return false
 	}
 	fb := s[0] // first byte
-	if jt.dotnames && len(s) == 2 && s[1] == '.' && (fb == 'm' || fb == 'n' || fb == 'u' || fb == 'v' || fb == 'x' || fb == 'y') {
+	if jt.Dotnames && len(s) == 2 && s[1] == '.' && (fb == 'm' || fb == 'n' || fb == 'u' || fb == 'v' || fb == 'x' || fb == 'y') {
 		fmt.Println("dotnames not supported")
 		return false
 	}
@@ -45,7 +45,7 @@ func nfs(jt *J, s string) (z A, ok bool) {
 		return
 	}
 	z = NewNameArray(ts)
-	jt.symb[s] = z
+	jt.Symb[s] = z
 	//fmt.Println("in nfs (not implemented), passed", s)
 	return z, true
 }
