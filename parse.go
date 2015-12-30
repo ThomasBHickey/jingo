@@ -39,7 +39,7 @@ type Action func(jt *J, b, e int, stack []A) (rv A, evn Event)
 // )
 func dyad(jt *J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In dyad", b, e)
-	showArrayScliceR(stack)
+	showArraySliceR(stack)
 	if (b - e) != 2 {
 		return z, EVSYNTAX
 	}
@@ -78,7 +78,7 @@ func vhook(jt *J, b, e int, stack []A) (z A, evn Event) {
 }
 func is(jt *J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In 'is'", b, e)
-	showArrayScliceR(stack)
+	showArraySliceR(stack)
 	if (b - e) != 2 {
 		return z, EVSYNTAX
 	}
@@ -106,6 +106,8 @@ type ptCase struct {
 }
 
 var ptCases [9]ptCase
+
+const NCASES = len(ptCases)
 
 func init() {
 	ptCases[0] = ptCase{[4]AType{EDGE, VERB, NOUN, ANY}, [2]Action{monad, vmonad}, 1, 2, 1}
@@ -143,13 +145,13 @@ func Parse(jt *J, q []A) (z A, evn Event) {
 	z, evn = Parsea(jt, q)
 	debz()
 	if evn != 0 {
-		fmt.Println("Error on Parsea", evn)
+		fmt.Println("Error on Parsea", evn, Event2String[evn])
 		return
 	}
 	return
 }
 
-func showArraySclice(aslice []A) {
+func showArraySlice(aslice []A) {
 	for i := 0; i < len(aslice); i++ {
 		a := aslice[i]
 		fmt.Print(" (", i, ":")
@@ -162,7 +164,7 @@ func showArraySclice(aslice []A) {
 	}
 	fmt.Println()
 }
-func showArrayScliceR(aslice []A) {
+func showArraySliceR(aslice []A) {
 	for i := len(aslice) - 1; i >= 0; i-- {
 		a := aslice[i]
 		fmt.Print(" (", i, ":")
@@ -178,30 +180,28 @@ func showArrayScliceR(aslice []A) {
 
 func Parsea(jt *J, q []A) (z A, evn Event) {
 	fmt.Println("in Parsea")
-	showArraySclice(q)
+	showArraySlice(q)
+	// Return if empty
 	if len(q) == 0 {
 		return z, EVVALUE
 	}
+	// other setup
 	jt.Asgn = false
 	jt.Parsercalls++
-
-	var i int
-	//var ptc ptCase
 	stack := []A{}
-	for i = 0; i < 4; i++ {
+	var i int
+	// C code manages stack & queue as one list
+	for i = 0; i < 4; i++ { // probably could be done more efficiently
 		stack = append(stack, q[len(q)-1])
 		q = q[0 : len(q)-1]
 	}
-	for {
-		stack = append(stack, q[len(q)-1])
-		fmt.Print("stack to compare")
-		showArrayScliceR(stack)
-		fmt.Println()
-		q = q[0 : len(q)-1]
+	for len(stack) > 1 {
+		fmt.Println("Main execution loop")
+		showArraySliceR(stack)
+		// cycle through cases
 		stp := len(stack) - 1 // stack top pos
 		for i = 0; i < len(ptCases); i++ {
 			pat := ptCases[i].pattern
-
 			if ((pat[0] & stack[stp-0].Type) != 0) &&
 				((pat[1] & stack[stp-1].Type) != 0) &&
 				((pat[2] & stack[stp-2].Type) != 0) &&
@@ -210,43 +210,41 @@ func Parsea(jt *J, q []A) (z A, evn Event) {
 				break
 			}
 		}
-		fmt.Println("pat pos", i)
-		stp = len(stack) - 1
-		if i < len(ptCases) {
+		if i < NCASES {
+			// execute the case
 			fmt.Println("Executing pattern", i)
 			ptCase := ptCases[i]
 			b, e := ptCase.begin, ptCase.end
 			j, k := stp-b, stp-e
-			fmt.Println("length of stack", len(stack))
-			fmt.Println("begin", b, j, "end", e, k)
 			f := ptCase.actions[0]
-			fmt.Println("stack[e+1].Data.(VAData).f2", stack[k+1].Data.(VAData).f2)
 			jt.Asgn = stack[k+1].Type == ASGN
-			fmt.Println("jt.Asgn", jt.Asgn)
-			if z, evn := f(jt, j, k, stack); evn != 0 {
+			if z, evn = f(jt, j, k, stack); evn != 0 {
 				fmt.Println("Non zero event from f call", evn)
-				return z, evn
-			} else {
-				fmt.Println("updating stack at", k, "using", z)
-				stack[k] = z
-				showArrayScliceR(stack)
-				fmt.Println("changing stack at :k+1 and j:", k+1, j)
-				stack = append(stack[:k+1], stack[j+1:]...)
-				fmt.Println("stack after trunc")
-				showArrayScliceR(stack)
+				return
 			}
+			// finish execution
+			fmt.Println("updating stack at", k, "using", z)
+			stack[k] = z
+			showArraySliceR(stack)
+			// fmt.Println("changing stack at :k+1 and j:", k+1, j)
+			stack = append(stack[:k+1], stack[j+1:]...)
+			fmt.Println("stack after trunc")
+			showArraySliceR(stack)
 		} else {
-			fmt.Println("No pattern found")
-		}
-		if len(q) < 1 {
-			break
+			// move from queue to stack
+			if len(q)==0{break}
+			fmt.Println("moving from q to stack")
+			stack = append(stack, q[len(q)-1])
+			q = q[0 : len(q)-1]
 		}
 	}
+	// cleanup
 	stack = stack[4:] // drop those 4 MARK arrays
 	fmt.Println("stack at end of parsea")
-	showArrayScliceR(stack)
-	if !(((stack[0].Type & CAVN) != 0) && (stack[1].Type == MARK)) {
+	showArraySliceR(stack)
+	if ((stack[0].Type & CAVN) == 0) || (stack[1].Type != MARK) {
 		return z, EVSYNTAX
 	}
+	// return value
 	return stack[0], 0
 }
