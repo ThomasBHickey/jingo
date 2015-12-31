@@ -37,6 +37,7 @@ type Action func(jt *J, b, e int, stack []A) (rv A, evn Event)
 // 	vmonad
 // 	vpunc
 // )
+
 func dyad(jt *J, b, e int, stack []A) (z A, evn Event) {
 	fmt.Println("In dyad", b, e)
 	showArraySliceR(stack)
@@ -232,10 +233,19 @@ func Parsea(jt *J, q []A) (z A, evn Event) {
 			showArraySliceR(stack)
 		} else {
 			// move from queue to stack
-			if len(q)==0{break}
-			fmt.Println("moving from q to stack")
+			if len(q) == 0 {
+				break
+			}
+			fmt.Println("moving from q to stack: qend=", q[len(q)-1])
 			stack = append(stack, q[len(q)-1])
 			q = q[0 : len(q)-1]
+			stop := len(stack) - 1
+			fmt.Println("stack[stop, stop-1]", stack[stop].Type, stack[stop-1].Type)
+			if (stack[stop].Type&NAME!=0) && ((stack[stop-1].Type&ASGN)==0) {
+				fmt.Println("Need to replace name with value", stack[stop])
+				fmt.Println("value of name", jt.Symb[stack[stop].Data.(NameData).name])
+				stack[stop] = jt.Symb[stack[stop].Data.(NameData).name]
+			}
 		}
 	}
 	// cleanup

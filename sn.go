@@ -45,7 +45,7 @@ func nfs(jt *J, s string) (z A, ok bool) {
 		return
 	}
 	z = NewNameArray(ts)
-	jt.Symb[s] = z
+	//jt.Symb[s] = z
 	//fmt.Println("in nfs (not implemented), passed", s)
 	return z, true
 }
