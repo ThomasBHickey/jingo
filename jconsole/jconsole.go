@@ -21,22 +21,21 @@ func getString(reader *bufio.Reader) (string, error) {
 	return ttext, nil
 }
 
-func prompt() {
-	fmt.Print(">")
+func prompt(prompt string) {
+	fmt.Print(prompt)
 }
 
 func main() {
-	fmt.Printf("hello from jconsole")
 	reader := bufio.NewReader(os.Stdin)
 	jt := jingo.GetJ()
-	jt.Log.Println("Starting jconsole")
+	jt.Log.Println("Starting in jconsole")
 	for {
-		prompt()
+		prompt(">")
 		text, err := getString(reader)
 		if err != nil {
 			break
 		}
-		//fmt.Println("read in", text)
 		jingo.JDo(jt, text)
 	}
+	jt.Log.Println("Finishing jconsole")
 }
