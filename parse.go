@@ -5,7 +5,7 @@
 package jingo
 
 import (
-	"fmt"
+//"fmt"
 )
 
 //type Action int
@@ -39,57 +39,55 @@ type Action func(jt *J, b, e int, stack []A) (rv A, evn Event)
 // )
 
 func dyad(jt *J, b, e int, stack []A) (z A, evn Event) {
-	fmt.Println("In dyad", b, e)
-	showArraySliceR(stack)
+	showArraySliceR(jt, "In dyad", stack)
 	if (b - e) != 2 {
 		return z, EVSYNTAX
 	}
-	fmt.Println("dyad 1st param", stack[e+2])
-	fmt.Println("dyad 2nd param", stack[e])
+	jt.Log.Println("dyad 1st param", stack[e+2])
+	jt.Log.Println("dyad 2nd param", stack[e])
 	return stack[e+1].Data.(VAData).f2(jt, stack[e+2], stack[e])
 }
 
 func monad(jt *J, b, e int, stack []A) (z A, evn Event) {
-	fmt.Println("In monad (not implemented)", b, e, stack)
+	jt.Log.Println("In monad (not implemented)", b, e, stack)
 	return
 }
 
 func adv(jt *J, b, e int, stack []A) (z A, evn Event) {
-	fmt.Println("In adv (not implemented)", b, e, stack)
+	jt.Log.Println("In adv (not implemented)", b, e, stack)
 	return
 }
 
 func conj(jt *J, b, e int, stack []A) (z A, evn Event) {
-	fmt.Println("In conj (not implemented)", b, e, stack)
+	jt.Log.Println("In conj (not implemented)", b, e, stack)
 	return
 }
 
 func trident(jt *J, b, e int, stack []A) (z A, evn Event) {
-	fmt.Println("In trident (not implemented)", b, e, stack)
+	jt.Log.Println("In trident (not implemented)", b, e, stack)
 	return
 }
 
 func bident(jt *J, b, e int, stack []A) (z A, evn Event) {
-	fmt.Println("In bident (not implemented", b, e, stack)
+	jt.Log.Println("In bident (not implemented", b, e, stack)
 	return
 }
 func vhook(jt *J, b, e int, stack []A) (z A, evn Event) {
-	fmt.Println("In vhook (not implemented)", b, e, stack)
+	jt.Log.Println("In vhook (not implemented)", b, e, stack)
 	return
 }
 func is(jt *J, b, e int, stack []A) (z A, evn Event) {
-	fmt.Println("In 'is'", b, e)
-	showArraySliceR(stack)
+	showArraySliceR(jt, "In 'is'", stack)
 	if (b - e) != 2 {
 		return z, EVSYNTAX
 	}
-	fmt.Println("is 1st param", stack[e+2])
-	fmt.Println("is 2nd param", stack[e])
+	jt.Log.Println("is 1st param", stack[e+2])
+	jt.Log.Println("is 2nd param", stack[e])
 	return stack[e+1].Data.(VAData).f2(jt, stack[e+2], stack[e])
 }
 
 func punc(jt *J, b, e int, stack []A) (z A, evn Event) {
-	fmt.Println("In punc (not implemented)", b, e, stack)
+	jt.Log.Println("In punc (not implemented)", b, e, stack)
 	return
 }
 
@@ -136,52 +134,53 @@ PT cases[] = {
  LPAR,      CAVN,      RPAR, ANY,       jtpunc,    jtvpunc,  0,2,0,
 };*/
 
-func Parse(jt *J, q []A) (z A, evn Event) {
-	fmt.Println("in Parse")
+func parse(jt *J, q []A) (z A, evn Event) {
+	jt.Log.Println("in Parse")
 	// problem:  deba expects an array, but we've got a slice of A's
 	if _, evn = deba(jt, DCPARSE, A{}, A{}, A{}); evn != 0 {
 		return
 	}
 	q = append([]A{mark}, append(q, []A{mark, mark, mark, mark}...)...)
-	z, evn = Parsea(jt, q)
+	z, evn = parsea(jt, q)
 	debz()
 	if evn != 0 {
-		fmt.Println("Error on Parsea", evn, Event2String[evn])
+		jt.Log.Println("Error on parsea", evn, Event2String[evn])
 		return
 	}
 	return
 }
 
-func showArraySlice(aslice []A) {
+func showArraySlice(jt *J, msg string, aslice []A) {
+	jt.Log.Println(msg)
 	for i := 0; i < len(aslice); i++ {
 		a := aslice[i]
-		fmt.Print(" (", i, ":")
+		jt.Log.Print(" (", i, ":")
 		switch a.Type {
 		case INT:
-			fmt.Print(" INT=", a.Data.([]int)[0], ") ")
+			jt.Log.Print(" INT=", a.Data.([]int)[0], ") ")
 		default:
-			fmt.Print(" ", a.Type, ") ")
+			jt.Log.Print(" ", a.Type, ") ")
 		}
 	}
-	fmt.Println()
+	jt.Log.Println()
 }
-func showArraySliceR(aslice []A) {
+func showArraySliceR(jt *J, msg string, aslice []A) {
+	jt.Log.Println(msg)
 	for i := len(aslice) - 1; i >= 0; i-- {
 		a := aslice[i]
-		fmt.Print(" (", i, ":")
+		jt.Log.Print(" (", i, ":")
 		switch a.Type {
 		case INT:
-			fmt.Print(" INT=", a.Data.([]int)[0], ") ")
+			jt.Log.Print(" INT=", a.Data.([]int)[0], ") ")
 		default:
-			fmt.Print(" ", a.Type, ") ")
+			jt.Log.Print(" ", a.Type, ") ")
 		}
 	}
-	fmt.Println()
+	jt.Log.Println()
 }
 
-func Parsea(jt *J, q []A) (z A, evn Event) {
-	fmt.Println("in Parsea")
-	showArraySlice(q)
+func parsea(jt *J, q []A) (z A, evn Event) {
+	showArraySlice(jt, "In Parsea", q)
 	// Return if empty
 	if len(q) == 0 {
 		return z, EVVALUE
@@ -197,8 +196,7 @@ func Parsea(jt *J, q []A) (z A, evn Event) {
 		q = q[0 : len(q)-1]
 	}
 	for len(stack) > 1 {
-		fmt.Println("Main execution loop")
-		showArraySliceR(stack)
+		showArraySliceR(jt, "Main execution loop", stack)
 		// cycle through cases
 		stp := len(stack) - 1 // stack top pos
 		for i = 0; i < len(ptCases); i++ {
@@ -207,51 +205,49 @@ func Parsea(jt *J, q []A) (z A, evn Event) {
 				((pat[1] & stack[stp-1].Type) != 0) &&
 				((pat[2] & stack[stp-2].Type) != 0) &&
 				((pat[3] & stack[stp-3].Type) != 0) {
-				fmt.Println("found match", i, "length of q", len(q))
+				jt.Log.Println("found match", i, "length of q", len(q))
 				break
 			}
 		}
 		if i < NCASES {
 			// execute the case
-			fmt.Println("Executing pattern", i)
+			jt.Log.Println("Executing pattern", i)
 			ptCase := ptCases[i]
 			b, e := ptCase.begin, ptCase.end
 			j, k := stp-b, stp-e
 			f := ptCase.actions[0]
 			jt.Asgn = stack[k+1].Type == ASGN
 			if z, evn = f(jt, j, k, stack); evn != 0 {
-				fmt.Println("Non zero event from f call", evn)
+				jt.Log.Println("Non zero event from f call", evn)
 				return
 			}
 			// finish execution
-			fmt.Println("updating stack at", k, "using", z)
+			jt.Log.Println("updating stack at", k, "using", z)
 			stack[k] = z
-			showArraySliceR(stack)
-			// fmt.Println("changing stack at :k+1 and j:", k+1, j)
+			showArraySliceR(jt, "", stack)
+			// jt.Log.Println("changing stack at :k+1 and j:", k+1, j)
 			stack = append(stack[:k+1], stack[j+1:]...)
-			fmt.Println("stack after trunc")
-			showArraySliceR(stack)
+			showArraySliceR(jt, "stack after trunc", stack)
 		} else {
 			// move from queue to stack
 			if len(q) == 0 {
 				break
 			}
-			fmt.Println("moving from q to stack: qend=", q[len(q)-1])
+			jt.Log.Println("moving from q to stack: qend=", q[len(q)-1])
 			stack = append(stack, q[len(q)-1])
 			q = q[0 : len(q)-1]
 			stop := len(stack) - 1
-			fmt.Println("stack[stop, stop-1]", stack[stop].Type, stack[stop-1].Type)
-			if (stack[stop].Type&NAME!=0) && ((stack[stop-1].Type&ASGN)==0) {
-				fmt.Println("Need to replace name with value", stack[stop])
-				fmt.Println("value of name", jt.Symb[stack[stop].Data.(NameData).name])
+			jt.Log.Println("stack[stop, stop-1]", stack[stop].Type, stack[stop-1].Type)
+			if (stack[stop].Type&NAME != 0) && ((stack[stop-1].Type & ASGN) == 0) {
+				jt.Log.Println("Need to replace name with value", stack[stop])
+				jt.Log.Println("value of name", jt.Symb[stack[stop].Data.(NameData).name])
 				stack[stop] = jt.Symb[stack[stop].Data.(NameData).name]
 			}
 		}
 	}
 	// cleanup
 	stack = stack[4:] // drop those 4 MARK arrays
-	fmt.Println("stack at end of parsea")
-	showArraySliceR(stack)
+	showArraySliceR(jt, "stack at end of parsea", stack)
 	if ((stack[0].Type & CAVN) == 0) || (stack[1].Type != MARK) {
 		return z, EVSYNTAX
 	}

@@ -3,6 +3,17 @@
 // license that can be found in the LICENSE file
 package jingo
 
+import (
+	"log"
+	"os"
+)
+
+var logger *log.Logger
+
+func init() {
+	logger = log.New(os.Stderr, "", 0)
+}
+
 // from jt.h:
 func GetJ() *J {
 	jt := J{}
@@ -12,6 +23,7 @@ func GetJ() *J {
 
 func initJ(jt *J) {
 	jt.Symb = map[string]A{}
+	jt.Log = logger
 	return
 }
 
@@ -124,6 +136,7 @@ type J struct {
 	//  I    lmon;             /* positive finite monadic level                   */
 	//  A    local;            /* local symbol table                              */
 	//  I    locsize[2];       /* size indices for named and numbered locales     */
+	Log *log.Logger
 	//  I    lright;           /* positive finite right   level                   */
 	//  A    ltext;            /* linear representation text                      */
 	//  AF   ltie;             /* linear representation tie   function            */

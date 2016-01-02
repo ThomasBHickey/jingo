@@ -5,11 +5,11 @@
 package jingo
 
 import (
-	"fmt"
+//"fmt"
 )
 
 func init() {
-	fmt.Println("SPARSE", SPARSE, "LIT", LIT, "SINT", SINT)
+	//fmt.Println("SPARSE", SPARSE, "LIT", LIT, "SINT", SINT)
 }
 
 /* Values for AFLAG(x) field of type A                                     */

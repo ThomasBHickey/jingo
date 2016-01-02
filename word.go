@@ -4,8 +4,8 @@
 package jingo
 
 import (
-	"fmt"
-	//"unicode/utf8"
+//"fmt"
+//"unicode/utf8"
 )
 
 type CSType int // char state type
@@ -67,8 +67,10 @@ func runeToWType(r rune) CBType {
 
 type wp struct{ Start, End int } // word position
 
-func Scan(jt *J, text string) []wp {
-	fmt.Println("In Scan", text)
+// these rountines should probably run on arrays (A's)
+
+func wordil(jt *J, text string) []wp {
+	jt.Log.Println("In Scan", text)
 	nv := false    // numeric value being built
 	cs := SS       // current state
 	wps := []wp{}  // word positions
@@ -79,7 +81,7 @@ func Scan(jt *J, text string) []wp {
 
 	for bpos, rune := range text {
 		ct := runeToCType(rune)
-		fmt.Println("curState", cs, "ctype", ct, "rune", rune)
+		//fmt.Println("curState", cs, "ctype", ct, "rune", rune)
 		p := state[cs][ct]
 		if e = p.effect; e == EI {
 			if t := t && (cs == S9); t {
@@ -91,10 +93,10 @@ func Scan(jt *J, text string) []wp {
 			} else {
 				if nv {
 					nv = false
-					fmt.Println("emit 1:", text[xb:xe])
+					//fmt.Println("emit 1:", text[xb:xe])
 					wps = append(wps, wp{xb, xe})
 				}
-				fmt.Println("emit 2:", text[b:bpos])
+				//fmt.Println("emit 2:", text[b:bpos])
 				wps = append(wps, wp{b, bpos})
 			}
 		}
@@ -111,19 +113,19 @@ func Scan(jt *J, text string) []wp {
 	if t {
 		if nv {
 			wps = append(wps, wp{xb, len(text)})
-			fmt.Println("emit 3a:", xb, len(text), text[xb:len(text)])
+			//fmt.Println("emit 3a:", xb, len(text), text[xb:len(text)])
 		} else {
 			wps = append(wps, wp{b, len(text)})
-			fmt.Println("emit 3b:", b, len(text), text[b:len(text)])
+			//fmt.Println("emit 3b:", b, len(text), text[b:len(text)])
 		}
 	} else {
 		if nv {
 			wps = append(wps, wp{xb, xe})
-			fmt.Println("emit 4:", xb, xe, text[xb:xe])
+			//fmt.Println("emit 4:", xb, xe, text[xb:xe])
 		}
 		if cs != SS {
 			wps = append(wps, wp{b, len(text)})
-			fmt.Println("emit 5:", b, len(text), text[b:len(text)])
+			//fmt.Println("emit 5:", b, len(text), text[b:len(text)])
 		}
 	}
 	return wps
@@ -136,8 +138,8 @@ func runeIfNotb(p rune, b bool) rune {
 	return p
 }
 
-func Enqueue(jt *J, wps []wp, text string) ([]A, Event) {
-	fmt.Println("In word.Enqueue")
+func enqueue(jt *J, wps []wp, text string) ([]A, Event) {
+	//fmt.Println("In word.Enqueue")
 	queue := []A{}
 	var y A
 	var b, ok bool
@@ -145,18 +147,18 @@ func Enqueue(jt *J, wps []wp, text string) ([]A, Event) {
 		s := text[wp.Start:wp.End] // string in utf-8
 		runes := ([]rune)(s)
 		wl := len(runes)
-		fmt.Println("s:", s, "wlength wl", wl)
+		//fmt.Println("s:", s, "wlength wl", wl)
 		c := runes[0]
 		e := IDType(c)
 		p := runeToCType(c)
 		b = false
-		fmt.Println("p: ctype[firstchar]", p)
+		//fmt.Println("p: ctype[firstchar]", p)
 		if wl > 1 {
 			d := ESCType(runes[len(runes)-1])
-			fmt.Println("d last char", d)
+			//fmt.Println("d last char", d)
 			if b = p != C9 && d == CESC1 || d == CESC2; b {
 				e = spellIn[s]
-				fmt.Println("b is true, e:", e)
+				//fmt.Println("b is true, e:", e)
 			}
 		}
 		// if y = cid2pdef(e); y.Type != NoAType {
@@ -165,16 +167,16 @@ func Enqueue(jt *J, wps []wp, text string) ([]A, Event) {
 		// }
 		// fmt.Println("y.Type", y.Type)
 		y, ok = cid2pdef(c, e)
-		fmt.Println("y, ok from cid2pdef(c, e)", y, ok)
+		//fmt.Println("y, ok from cid2pdef(c, e)", y, ok)
 		if ok {
-			fmt.Println("c<128, e=", e, "ok", ok, "y=id2pdef[e]", y)
+			///fmt.Println("c<128, e=", e, "ok", ok, "y=id2pdef[e]", y)
 			queue = append(queue, y)
-			fmt.Println("queue", queue)
+			//fmt.Println("queue", queue)
 		} else if e == CFCONS {
-			fmt.Println("Unexpected CFCONS")
+			//fmt.Println("Unexpected CFCONS")
 			return queue, EVSPELL
 		} else if b {
-			fmt.Println("UNEXPECTED b?")
+			//fmt.Println("UNEXPECTED b?")
 			jsignal2(EVSPELL, wp)
 			return queue, EVSPELL
 		} else {
@@ -196,7 +198,7 @@ func Enqueue(jt *J, wps []wp, text string) ([]A, Event) {
 					jt.Curname, _ = nfs(jt, s)
 					return []A{}, EVILNAME
 				}
-				fmt.Println("valnm OK")
+				//fmt.Println("valnm OK")
 				y, ok = nfs(jt, s)
 				if !ok {
 					return []A{}, EVILNAME
@@ -209,4 +211,9 @@ func Enqueue(jt *J, wps []wp, text string) ([]A, Event) {
 		}
 	}
 	return queue, 0
+}
+
+func tokens(jt *J, text string) ([]A, Event) {
+	return enqueue(jt, wordil(jt, text), text)
+
 }
