@@ -4,8 +4,8 @@
 package jingo
 
 import (
-	//"errors"
-	"fmt"
+//"errors"
+//"fmt"
 )
 
 var ctype = [128]CBType{
@@ -57,19 +57,19 @@ type VAData struct {
 	id IDType
 }
 
-//	id2pdef[CASGN] = pdef{atype: ASGN, Dyad: asgn} // =.
-func add2(jt *J, x, w A) (A, Event) {
-	ra := NewIntArray(x.Shape)
-	if x.Type == INT && w.Type == INT && x.Length == 1 && w.Length == 1 {
-		ra.Data = make([]int, x.Length)
-		ra.Data.([]int)[0] = x.Data.([]int)[0] + w.Data.([]int)[0]
-		fmt.Println("add2 returning", ra)
-		return ra, 0
-	}
-	fmt.Println("add2 failed")
-	return ra, EVVALUE
-}
+// func add2(jt *J, x, w A) (A, Event) {
+// 	ra := NewIntArray(x.Shape)
+// 	if x.Type == INT && w.Type == INT && x.Length == 1 && w.Length == 1 {
+// 		ra.Data = make([]int, x.Length)
+// 		ra.Data.([]int)[0] = x.Data.([]int)[0] + w.Data.([]int)[0]
+// 		fmt.Println("add2 returning", ra)
+// 		return ra, 0
+// 	}
+// 	fmt.Println("add2 failed")
+// 	return ra, EVVALUE
+// }
 
+//	id2pdef[CASGN] = pdef{atype: ASGN, Dyad: asgn} // =.
 func asgn(jt *J, a A, w A) (A, Event) {
 	//fmt.Println("In func asgn!")
 	//fmt.Println("param a", a)
@@ -82,5 +82,5 @@ type value struct{ z int }
 
 func init() {
 	id2pdef[CASGN] = NewASGNArray(VAData{f2: asgn, id: CASGN})
-	id2pdef[CPLUS] = NewVerbArray(VAData{f2: add2})
+	id2pdef[CPLUS] = NewVerbArray(VAData{f2: plus, id:CPLUS})
 }

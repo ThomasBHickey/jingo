@@ -4,8 +4,8 @@
 package jingo
 
 import (
-	"fmt"
-	//"unicode/utf8"
+//"fmt"
+//"unicode/utf8"
 )
 
 // From dsusp.c:
@@ -25,7 +25,7 @@ const (
 )
 
 func deba(jt *J, t DCType, x, y, fs A) (d []DST, evn Event) {
-	fmt.Println("Call to jtdeba")
+	jt.Log.Println("Call to jtdeba")
 	return
 }
 

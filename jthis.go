@@ -174,6 +174,7 @@ type J struct {
 	//  C    pp[8];            /* print precision                                 */
 	//  AF   pre;              /* preface function for assignment                 */
 	//  I*   rank;             /* for integrated rank support                     */
+	rank *int // not sure why a pointer --Th
 	//  I    redefined;        /* symbol table entry of redefined explicit defn   */
 	//  int  reginitflag;      /* 1 iff regular expression stuff initialized      */
 	//  I    rela;             /* if a is relative, a itself; else 0              */
@@ -211,6 +212,7 @@ type J struct {
 	//  I    seclev;           /* security level                                  */
 	//  B    sesm;             /* whether there is a session manager              */
 	//  A    sf;               /* for $:                                          */
+	sf A
 	//  DC   sitop;            /* top of SI stack                                 */
 	//  A    slist;            /* files used in right arg to 0!:                  */
 	//  I    slisti;           /* index into slist of current script              */

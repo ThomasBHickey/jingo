@@ -5,7 +5,7 @@
 package jingo
 
 import (
-//"fmt"
+"fmt"
 )
 
 //type Action int
@@ -45,7 +45,16 @@ func dyad(jt *J, b, e int, stack []A) (z A, evn Event) {
 	}
 	jt.Log.Println("dyad 1st param", stack[e+2])
 	jt.Log.Println("dyad 2nd param", stack[e])
-	return stack[e+1].Data.(VAData).f2(jt, stack[e+2], stack[e])
+	//return stack[e+1].Data.(VAData).f2(jt, stack[e+2], stack[e])
+	sfold := jt.sf
+	verbA := stack[e+1]
+	jt.sf = verbA
+	z, evn = verbA.Data.(VAData).f2(jt, stack[e+2], stack[e])
+	if evn != 0 {
+		jt.Log.Println("dyad call", Event2String[evn])
+	}
+	jt.sf = sfold
+	return
 }
 
 func monad(jt *J, b, e int, stack []A) (z A, evn Event) {
@@ -149,36 +158,53 @@ func parse(jt *J, q []A) (z A, evn Event) {
 	}
 	return
 }
-
 func showArraySlice(jt *J, msg string, aslice []A) {
 	jt.Log.Println(msg)
-	for i := 0; i < len(aslice); i++ {
+	s := ""
+	for i := 0; i<len(aslice); i++ {
 		a := aslice[i]
-		jt.Log.Print(" (", i, ":")
+		s = s + fmt.Sprintf(" (%d:",i)
 		switch a.Type {
 		case INT:
-			jt.Log.Print(" INT=", a.Data.([]int)[0], ") ")
+			s = s + fmt.Sprintf(" INT=%d)", a.Data.([]int)[0])
+		case VERB:
+			s = s+fmt.Sprintf(" VERB=%s)", a.Data.(VAData).id)
 		default:
-			jt.Log.Print(" ", a.Type, ") ")
+			s = s+fmt.Sprintf(" %s)", a.Type)
 		}
 	}
-	jt.Log.Println()
+	jt.Log.Println(s)
 }
+// func showArraySlice(jt *J, msg string, aslice []A) {
+// 	jt.Log.Println(msg)
+// 	for i := 0; i < len(aslice); i++ {
+// 		a := aslice[i]
+// 		jt.Log.Print(" (", i, ":")
+// 		switch a.Type {
+// 		case INT:
+// 			jt.Log.Print(" INT=", a.Data.([]int)[0], ") ")
+// 		default:
+// 			jt.Log.Print(" ", a.Type, ") ")
+// 		}
+// 	}
+// 	jt.Log.Println()
+// }
 func showArraySliceR(jt *J, msg string, aslice []A) {
 	jt.Log.Println(msg)
+	s := ""
 	for i := len(aslice) - 1; i >= 0; i-- {
 		a := aslice[i]
-		jt.Log.Print(" (", i, ":")
+		s = s + fmt.Sprintf(" (%d:",i)
 		switch a.Type {
 		case INT:
-			jt.Log.Print(" INT=", a.Data.([]int)[0], ") ")
+			s = s + fmt.Sprintf(" INT=%d)", a.Data.([]int)[0])
 		case VERB:
-			jt.Log.Print(" VERB=", a.Data)
+			s = s+fmt.Sprintf(" VERB=%s)", a.Data.(VAData).id)
 		default:
-			jt.Log.Print(" ", a.Type, ") ")
+			s = s+fmt.Sprintf(" %s)", a.Type)
 		}
 	}
-	jt.Log.Println()
+	jt.Log.Println(s)
 }
 
 func parsea(jt *J, q []A) (z A, evn Event) {
@@ -220,7 +246,7 @@ func parsea(jt *J, q []A) (z A, evn Event) {
 			f := ptCase.actions[0]
 			jt.Asgn = stack[k+1].Type == ASGN
 			if z, evn = f(jt, j, k, stack); evn != 0 {
-				jt.Log.Println("Non zero event from f call", evn)
+				jt.Log.Println("ERROR event from f call:", Event2String[evn])
 				return
 			}
 			// finish execution
