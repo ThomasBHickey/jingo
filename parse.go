@@ -172,6 +172,8 @@ func showArraySliceR(jt *J, msg string, aslice []A) {
 		switch a.Type {
 		case INT:
 			jt.Log.Print(" INT=", a.Data.([]int)[0], ") ")
+		case VERB:
+			jt.Log.Print(" VERB=", a.Data)
 		default:
 			jt.Log.Print(" ", a.Type, ") ")
 		}

@@ -167,7 +167,7 @@ func enqueue(jt *J, wps []wp, text string) ([]A, Event) {
 		// }
 		// fmt.Println("y.Type", y.Type)
 		y, ok = cid2pdef(c, e)
-		//fmt.Println("y, ok from cid2pdef(c, e)", y, ok)
+		jt.Log.Println("y, ok from cid2pdef(c, e)", y, ok)
 		if ok {
 			///fmt.Println("c<128, e=", e, "ok", ok, "y=id2pdef[e]", y)
 			queue = append(queue, y)

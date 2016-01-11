@@ -11,6 +11,8 @@ import (
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 	jt := jingo.GetJ()
+	//jt.Log = log.New(os.Stderr, "", 0)
+	jt.Log.Println("Starting in main")
 	for {
 		fmt.Print("> ")
 		text, _ := reader.ReadString('\n')
