@@ -89,3 +89,25 @@ type DST struct { /* 1 2 3                                                      
 	dcsusp bool /* x   x  1 iff begins a debug suspension                       */
 	dcss   byte /*     x  single step code                                      */
 }
+
+func DTYPE(t AType) AType {
+	if (t & SB01) != 0 {
+		return B01
+	}
+	if (t & SINT) != 0 {
+		return INT
+	}
+	if (t & SFL) != 0 {
+		return FL
+	}
+	if (t & SCMPX) != 0 {
+		return CMPX
+	}
+	if (t & SLIT) != 0 {
+		return LIT
+	}
+	if (t & SBOX) != 0 {
+		return BOX
+	}
+	return 0
+}

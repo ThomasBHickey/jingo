@@ -5,7 +5,7 @@
 package jingo
 
 import (
-"fmt"
+	"fmt"
 )
 
 //type Action int
@@ -161,47 +161,34 @@ func parse(jt *J, q []A) (z A, evn Event) {
 func showArraySlice(jt *J, msg string, aslice []A) {
 	jt.Log.Println(msg)
 	s := ""
-	for i := 0; i<len(aslice); i++ {
+	for i := 0; i < len(aslice); i++ {
 		a := aslice[i]
-		s = s + fmt.Sprintf(" (%d:",i)
+		s = s + fmt.Sprintf(" (%d:", i)
 		switch a.Type {
 		case INT:
 			s = s + fmt.Sprintf(" INT=%d)", a.Data.([]int)[0])
 		case VERB:
-			s = s+fmt.Sprintf(" VERB=%s)", a.Data.(VAData).id)
+			s = s + fmt.Sprintf(" VERB=%s)", a.Data.(VAData).id)
 		default:
-			s = s+fmt.Sprintf(" %s)", a.Type)
+			s = s + fmt.Sprintf(" %s)", a.Type)
 		}
 	}
 	jt.Log.Println(s)
 }
-// func showArraySlice(jt *J, msg string, aslice []A) {
-// 	jt.Log.Println(msg)
-// 	for i := 0; i < len(aslice); i++ {
-// 		a := aslice[i]
-// 		jt.Log.Print(" (", i, ":")
-// 		switch a.Type {
-// 		case INT:
-// 			jt.Log.Print(" INT=", a.Data.([]int)[0], ") ")
-// 		default:
-// 			jt.Log.Print(" ", a.Type, ") ")
-// 		}
-// 	}
-// 	jt.Log.Println()
-// }
+
 func showArraySliceR(jt *J, msg string, aslice []A) {
 	jt.Log.Println(msg)
 	s := ""
 	for i := len(aslice) - 1; i >= 0; i-- {
 		a := aslice[i]
-		s = s + fmt.Sprintf(" (%d:",i)
+		s = s + fmt.Sprintf(" (%d:", i)
 		switch a.Type {
 		case INT:
 			s = s + fmt.Sprintf(" INT=%d)", a.Data.([]int)[0])
 		case VERB:
-			s = s+fmt.Sprintf(" VERB=%s)", a.Data.(VAData).id)
+			s = s + fmt.Sprintf(" VERB=%s)", a.Data.(VAData).id)
 		default:
-			s = s+fmt.Sprintf(" %s)", a.Type)
+			s = s + fmt.Sprintf(" %s)", a.Type)
 		}
 	}
 	jt.Log.Println(s)

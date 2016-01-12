@@ -82,5 +82,5 @@ type value struct{ z int }
 
 func init() {
 	id2pdef[CASGN] = NewASGNArray(VAData{f2: asgn, id: CASGN})
-	id2pdef[CPLUS] = NewVerbArray(VAData{f2: plus, id:CPLUS})
+	id2pdef[CPLUS] = NewVerbArray(VAData{f2: plus, id: CPLUS})
 }
