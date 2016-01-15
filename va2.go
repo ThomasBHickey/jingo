@@ -109,7 +109,7 @@ func va2(jt *J, a, w A, id IDType) (z A, evn Event) {
 		b = (t & XNUM) != 0 // b = 1&&t&XNUM
 		if t != at {
 			if b {
-				var param CVType
+				var param XMode
 				if (cv & VXEQ) != 0 {
 					param = XMEXMT
 				} else if (cv & VXFC) != 0 {
