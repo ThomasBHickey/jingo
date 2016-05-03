@@ -1,0 +1,133 @@
+Starting in jconsole
+In Scan 1+2
+y, ok from cid2pdef(c, e) {NoAType 0 0 [] <nil>} false
+y, ok from cid2pdef(c, e) {VERB 0 1 [] {<nil> 0x47c1e0 {0 0 0 [] <nil>} {0 0 0 [] <nil>} {0 0 0 [] <nil>} false 0 0 0 0 0}} true
+y, ok from cid2pdef(c, e) {NoAType 0 0 [] <nil>} false
+in Parse
+Call to jtdeba
+In Parsea
+ (0:
+ MARK) 
+ (1:
+ INT=1) 
+ (2:
+ VERB) 
+ (3:
+ INT=2) 
+ (4:
+ MARK) 
+ (5:
+ MARK) 
+ (6:
+ MARK) 
+ (7:
+ MARK) 
+
+Main execution loop
+ (3:
+ %!(EXTRA jingo.AType=MARK, string=) )
+ (2:
+ %!(EXTRA jingo.AType=MARK, string=) )
+ (1:
+ %!(EXTRA jingo.AType=MARK, string=) )
+ (0:
+ %!(EXTRA jingo.AType=MARK, string=) )
+
+moving from q to stack: qend= {INT 0 1 [] [2]}
+stack[stop, stop-1] INT MARK
+Main execution loop
+ (4:
+ INT=%!(EXTRA int=2, string=) )
+ (3:
+ %!(EXTRA jingo.AType=MARK, string=) )
+ (2:
+ %!(EXTRA jingo.AType=MARK, string=) )
+ (1:
+ %!(EXTRA jingo.AType=MARK, string=) )
+ (0:
+ %!(EXTRA jingo.AType=MARK, string=) )
+
+moving from q to stack: qend= {VERB 0 1 [] {<nil> 0x47c1e0 {0 0 0 [] <nil>} {0 0 0 [] <nil>} {0 0 0 [] <nil>} false 0 0 0 0 0}}
+stack[stop, stop-1] VERB INT
+Main execution loop
+ (5:
+ VERB=%!(EXTRA jingo.VAData={<nil> 0x47c1e0 {0 0 0 [] <nil>} {0 0 0 [] <nil>} {0 0 0 [] <nil>} false 0 0 0 0 0})
+ (4:
+ INT=%!(EXTRA int=2, string=) )
+ (3:
+ %!(EXTRA jingo.AType=MARK, string=) )
+ (2:
+ %!(EXTRA jingo.AType=MARK, string=) )
+ (1:
+ %!(EXTRA jingo.AType=MARK, string=) )
+ (0:
+ %!(EXTRA jingo.AType=MARK, string=) )
+
+moving from q to stack: qend= {INT 0 1 [] [1]}
+stack[stop, stop-1] INT VERB
+Main execution loop
+ (6:
+ INT=%!(EXTRA int=1, string=) )
+ (5:
+ VERB=%!(EXTRA jingo.VAData={<nil> 0x47c1e0 {0 0 0 [] <nil>} {0 0 0 [] <nil>} {0 0 0 [] <nil>} false 0 0 0 0 0})
+ (4:
+ INT=%!(EXTRA int=2, string=) )
+ (3:
+ %!(EXTRA jingo.AType=MARK, string=) )
+ (2:
+ %!(EXTRA jingo.AType=MARK, string=) )
+ (1:
+ %!(EXTRA jingo.AType=MARK, string=) )
+ (0:
+ %!(EXTRA jingo.AType=MARK, string=) )
+
+moving from q to stack: qend= {MARK 0 1 [] <nil>}
+stack[stop, stop-1] MARK INT
+Main execution loop
+ (7:
+ %!(EXTRA jingo.AType=MARK, string=) )
+ (6:
+ INT=%!(EXTRA int=1, string=) )
+ (5:
+ VERB=%!(EXTRA jingo.VAData={<nil> 0x47c1e0 {0 0 0 [] <nil>} {0 0 0 [] <nil>} {0 0 0 [] <nil>} false 0 0 0 0 0})
+ (4:
+ INT=%!(EXTRA int=2, string=) )
+ (3:
+ %!(EXTRA jingo.AType=MARK, string=) )
+ (2:
+ %!(EXTRA jingo.AType=MARK, string=) )
+ (1:
+ %!(EXTRA jingo.AType=MARK, string=) )
+ (0:
+ %!(EXTRA jingo.AType=MARK, string=) )
+
+found match 2 length of q 0
+Executing pattern 2
+In dyad
+ (7:
+ %!(EXTRA jingo.AType=MARK, string=) )
+ (6:
+ INT=%!(EXTRA int=1, string=) )
+ (5:
+ VERB=%!(EXTRA jingo.VAData={<nil> 0x47c1e0 {0 0 0 [] <nil>} {0 0 0 [] <nil>} {0 0 0 [] <nil>} false 0 0 0 0 0})
+ (4:
+ INT=%!(EXTRA int=2, string=) )
+ (3:
+ %!(EXTRA jingo.AType=MARK, string=) )
+ (2:
+ %!(EXTRA jingo.AType=MARK, string=) )
+ (1:
+ %!(EXTRA jingo.AType=MARK, string=) )
+ (0:
+ %!(EXTRA jingo.AType=MARK, string=) )
+
+dyad 1st param {INT 0 1 [] [1]}
+dyad 2nd param {INT 0 1 [] [2]}
+In plus
+In va2
+an, ar, at, aw 1 0 INT []
+wn, wr, ws, wt 1 0 INT []
+dyad call system error
+ERROR event from f call: system error
+Error on parsea 19 system error
+Finishing jconsole

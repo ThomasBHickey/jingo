@@ -4,21 +4,27 @@
 
 package jingo
 
-func cvt(jt *J, t int, w A) (y A) {
+func cvt(jt *J, t AType, w A) (y A) {
 	oq := jt.rank
 	*jt.rank = 0
-	b := ccvt(t, w, &y)
+	b := ccvt(jt, t, w, &y)
+	jt.Log.Println("cvt b:", b)
 	jt.rank = oq
 	return
+}
+
+func xcvt(jt *J, param XMode, a A)(y A) {
+	jt.Log.Println("xcvt is not implemented")
+	return a
 }
 
 // static B jtccvt(J jt,I t,A w,A*y){A d;I n,r,*s,wt,*wv,*yv;
 func ccvt(jt *J, t AType, w A, y *A)bool {
 //  RZ(w);
-	if w.Type==NoType {return false}
+	if w.Type==NoAType {return false}
 //  r=AR(w); s=AS(w);
-	s := w.Shape
-	r:= len(s)
+	//s := w.Shape
+	//r:= len(s)
 	if (t&SPARSE)!=0 || (w.Type&SPARSE)!=0{
 		jt.Log.Println("SPARSE arrays not supported")
 		return false
@@ -70,4 +76,5 @@ func ccvt(jt *J, t AType, w A, y *A)bool {
 //   case CVCASE(CMPX,RAT ): GA(d,FL,  n,r,s); RZ(DfromQ(w,AV(d))); R ccvt(t,d,y);
 //   default:                ASSERT(0,EVDOMAIN);
 // }}
+	return true
 }

@@ -103,7 +103,7 @@ func va2(jt *J, a, w A, id IDType) (z A, evn Event) {
 	if !b {
 		return
 	}
-	zt := rtype(cv)
+	//zt := rtype(cv)
 	t := atype(cv)
 	if (t != 0) && !sp {
 		b = (t & XNUM) != 0 // b = 1&&t&XNUM
@@ -119,9 +119,9 @@ func va2(jt *J, a, w A, id IDType) (z A, evn Event) {
 				} else {
 					param = XMEXACT
 				}
-				a = xcvt(param, a)
+				a = xcvt(jt, param, a)
 			} else {
-				a = cvt(t, a)
+				a = cvt(jt, t, a)
 			}
 		}
 	}
